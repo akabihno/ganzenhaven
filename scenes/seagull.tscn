@@ -1,10 +1,25 @@
 [gd_scene format=3 uid="uid://3yw5ooapi42"]
 
-[ext_resource type="Script" uid="uid://bymo076up4ksi" path="res://scripts/seagull_dialogue.gd" id="1_htak3"]
+[ext_resource type="Script" path="res://scripts/SeagullDialogue.cs" id="1_htak3"]
+[ext_resource type="Texture2D" uid="uid://bddho2wooyna7" path="res://assets/harbourmaster_office_final.png" id="2_or5sd"]
+[ext_resource type="Script" path="res://scripts/TextureSprite.cs" id="3_su3vp"]
+[ext_resource type="Script" path="res://scripts/NpcSpawner.cs" id="4_su3vp"]
 
 [node name="seagull" type="Node" unique_id=443424798]
 
 [node name="Seagull" type="Sprite2D" parent="." unique_id=1954808309]
-position = Vector2(600, 250)
-scale = Vector2(0.42, 0.42)
+position = Vector2(790, 283)
+scale = Vector2(0.3, 0.3)
 script = ExtResource("1_htak3")
+DrawBackdrop = false
+
+[node name="Background" type="Sprite2D" parent="." unique_id=662684529]
+z_index = -10
+position = Vector2(576, 324)
+scale = Vector2(0.6, 0.6)
+texture = ExtResource("2_or5sd")
+script = ExtResource("3_su3vp")
+TexturePath = "res://assets/harbourmaster_office_final.png"
+
+[node name="NPCs" type="Node2D" parent="." unique_id=1383028730]
+script = ExtResource("4_su3vp")
