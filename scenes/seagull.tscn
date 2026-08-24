@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://3yw5ooapi42"]
+
+[ext_resource type="Script" uid="uid://bymo076up4ksi" path="res://scripts/seagull_dialogue.gd" id="1_htak3"]
+
+[node name="seagull" type="Node" unique_id=443424798]
+
+[node name="Seagull" type="Sprite2D" parent="." unique_id=1954808309]
+position = Vector2(600, 250)
+scale = Vector2(0.42, 0.42)
+script = ExtResource("1_htak3")

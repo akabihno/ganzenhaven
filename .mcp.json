@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "godot": {
+      "type": "stdio",
+      "command": "/Users/arsolga/PhpstormProjects/Godot-MCP/python/venv/bin/python",
+      "args": [
+        "/Users/arsolga/PhpstormProjects/Godot-MCP/python/server.py"
+      ],
+      "env": {}
+    }
+  }
+}

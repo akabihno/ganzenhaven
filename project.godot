@@ -11,9 +11,8 @@ config_version=5
 [application]
 
 config/name="ganzenhaven"
-run/main_scene="uid://bt4rwqg335hsl"
+run/main_scene="uid://3yw5ooapi42"
 config/features=PackedStringArray("4.7", "C#", "Forward Plus")
-config/icon="res://icon.svg"
 
 [display]
 
@@ -23,6 +22,10 @@ window/stretch/aspect="expand"
 [dotnet]
 
 project/assembly_name="ganzenhaven"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 
 [physics]
 
