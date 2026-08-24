@@ -1,0 +1,11 @@
+[gd_scene format=3 uid="uid://bt4rwqg335hsl"]
+
+[ext_resource type="Texture2D" uid="uid://bddho2wooyna7" path="res://assets/harbourmaster_office_final.png" id="1_4dvvg"]
+[ext_resource type="Script" uid="uid://l5cfh3j62lj1" path="res://scripts/Node2d.cs" id="2_4dvvg"]
+
+[node name="Sprite2D" type="Sprite2D" unique_id=1649110370]
+position = Vector2(564, 374)
+texture = ExtResource("1_4dvvg")
+script = ExtResource("2_4dvvg")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1261241905]
