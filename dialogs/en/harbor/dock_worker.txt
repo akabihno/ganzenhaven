@@ -1,0 +1,6 @@
+# PLACEHOLDER — replace with your dialogue.
+@show dock_worker
+@if tavern_keeper_dead
+  Dock Worker: [placeholder — after the Tavern Keeper's death]
+@else
+  Dock Worker: [placeholder — before]

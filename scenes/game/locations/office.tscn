@@ -1,0 +1,75 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
+[ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
+[ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+
+[node name="Office" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loc")
+LocationId = "office"
+EnterScript = "intro"
+EnterScriptIf = "!intro_done"
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Window" type="Control" parent="."]
+offset_left = 1290
+offset_top = 290
+offset_right = 1690
+offset_bottom = 700
+script = ExtResource("3_hot")
+LabelKey = "hs_window"
+Dialogue = "office/window"
+
+[node name="Ledger" type="Control" parent="."]
+offset_left = 430
+offset_top = 700
+offset_right = 1050
+offset_bottom = 830
+script = ExtResource("3_hot")
+LabelKey = "hs_ledger"
+Dialogue = "office/ledger"
+
+[node name="Hearth" type="Control" parent="."]
+offset_left = 0
+offset_top = 780
+offset_right = 330
+offset_bottom = 1010
+script = ExtResource("3_hot")
+LabelKey = "hs_hearth"
+Dialogue = "office/hearth"
+
+[node name="ShipModel" type="Control" parent="."]
+offset_left = 800
+offset_top = 380
+offset_right = 1010
+offset_bottom = 500
+script = ExtResource("3_hot")
+LabelKey = "hs_ship_model"
+Dialogue = "office/ship_model"
+
+[node name="Seagull" type="Control" parent="."]
+offset_left = 1335
+offset_top = 735
+offset_right = 1625
+offset_bottom = 965
+script = ExtResource("2_spot")
+CharacterId = "seagull"
+Dialogue = "office/seagull"
+Height = 230.0
+ShowIf = "intro_done"

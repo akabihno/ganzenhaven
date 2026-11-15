@@ -1,0 +1,51 @@
+keys,en,ru
+menu_new,New game,Новая игра
+menu_continue,Continue,Продолжить
+menu_quit,Quit,Выход
+btn_map,Map,Карта
+btn_back,Back,Назад
+btn_menu,Menu,Меню
+btn_journal,Journal,Журнал
+btn_close,Close,Закрыть
+journal_title,Journal,Журнал
+journal_empty,Nothing written yet.,Пока ничего не записано.
+journal_new,New in the journal,Новое в журнале
+journal_done,Done,Сделано
+journal_done_heading,Done,Сделано
+journal_close_hint,Click anywhere to close,"Щёлкните, чтобы закрыть"
+map_title,Ganzenhaven,Ганзенхавен
+loc_office,Harbourmaster's Office,Контора начальника порта
+loc_harbor,Harbour,Гавань
+loc_bushes,Bushes,Кусты
+loc_strange_oak,Strange Oak,Странный дуб
+loc_graveyard,Graveyard,Кладбище
+loc_tavern,Tavern,Таверна
+char_seagull,Seagull,Чайка
+char_tavern_keeper,Tavern Keeper,Трактирщик
+char_fisherman,Fisherman,Рыбак
+char_dock_worker,Dock Worker,Грузчик
+char_gravedigger,Gravedigger,Могильщик
+char_herb_woman,Herb Woman,Травница
+char_priest,Priest,Священник
+char_black_cat,Black Cat,Чёрный кот
+hs_window,The window,Окно
+hs_ledger,The ledger,Книга учёта
+hs_hearth,The hearth,Очаг
+hs_ship_model,The ship model,Модель корабля
+hs_crane,The crane,Кран
+hs_cog,The cog,Корабль
+hs_rope,Rope,Канат
+hs_cloth,A scrap of cloth,Клочок ткани
+hs_thicket,The thicket,Чаща
+hs_town,The town in the fog,Город в тумане
+hs_hollow,The hollow,Дупло
+hs_ribbons,Ribbons,Ленты
+hs_stones,The stone ring,Каменный круг
+hs_church,The church,Церковь
+hs_old_grave,An old grave,Старая могила
+hs_sea,The sea,Море
+hs_barrels,Barrels,Бочки
+hs_lantern,The lantern,Фонарь
+hs_nets,Nets,Сети
+hs_counter,The counter,Стойка
+cutscene_funeral_placeholder,"The funeral procession (3D cutscene, coming next)","Похоронная процессия (3D-сцена, скоро будет)"

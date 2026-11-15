@@ -1,0 +1,20 @@
+{
+  "4837223df4b8": {
+    "speaker": "Seagull",
+    "expression": "",
+    "text": "Here it is again, the same pitying head tilt",
+    "sent": "[weary, sarcastic] Here it is again, the same pitying head tilt"
+  },
+  "67dfd64c11f4": {
+    "speaker": "Seagull",
+    "expression": "",
+    "text": "Maybe, but I will not tolerate such familiarity.",
+    "sent": "[weary, sarcastic] Maybe, but I will not tolerate such familiarity."
+  },
+  "ff994e63ef29": {
+    "speaker": "Seagull",
+    "expression": "tilt",
+    "text": "Do you _have_ fish?",
+    "sent": "[curious, sceptical] Do you HAVE fish?"
+  }
+}

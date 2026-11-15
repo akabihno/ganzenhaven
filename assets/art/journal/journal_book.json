@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1dfdc-4c48-7773-ab27-4a4754156234",
+  "prompt": "Keep the same dark scratched wooden table, the same warm lighting, the same quill and inkwell and the same painterly illustrated style. Replace the map with an old open leather-bound journal lying in the middle of the table, seen straight from above, its two pages blank: aged, slightly stained, yellowed parchment paper, completely empty, no writing, no text, no letters, no drawings. The open book fills most of the picture. Worn brown leather cover with a ribbon bookmark.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/map/town_map.png"
+  ],
+  "consumed_credits": 6
+}

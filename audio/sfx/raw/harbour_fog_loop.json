@@ -1,0 +1,7 @@
+{
+  "text": "Foggy medieval harbour heard from inside a stone room through an open window: gentle waves lapping against wooden pilings, distant seagulls crying, creaking ship rigging and mooring ropes, soft wind. Calm and steady, no music, no voices.",
+  "loop": true,
+  "prompt_influence": 0.5,
+  "model_id": "eleven_text_to_sound_v3",
+  "duration_seconds": 20.0
+}

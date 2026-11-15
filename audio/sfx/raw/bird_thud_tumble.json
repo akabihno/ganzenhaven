@@ -1,0 +1,7 @@
+{
+  "text": "A large bird hitting a wooden floor with a soft heavy thump, then tumbling and rolling over the boards, feathers rustling, wings flapping weakly.",
+  "loop": false,
+  "prompt_influence": 0.5,
+  "model_id": "eleven_text_to_sound_v3",
+  "duration_seconds": 2.5
+}

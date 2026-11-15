@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1dfcd-f145-7382-955e-07d06fb93748",
+  "prompt": "Keep this exact herring gull: same feathers, colours, size, lighting and the same broken right wing hanging limp and dragging on the ground, same standing pose and feet. Change only the head: the head is tilted sharply to one side, cocked quizzically like a bird asking a question, one eye turned toward the viewer, beak closed. Plain background.",
+  "model": "nano-banana-2",
+  "aspect": "1:1",
+  "references": [
+    "assets/concepts/seagull_broken_wing_a.png"
+  ],
+  "consumed_credits": 6
+}

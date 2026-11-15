@@ -1,0 +1,5 @@
+# PLACEHOLDER — replace with your dialogue.
+# He is only in the tavern before his death (TavernKeeper spot: HideIf = "tavern_keeper_dead").
+# His death itself is yours to script: somewhere, "$set tavern_keeper_dead" starts the second act.
+@show tavern_keeper
+Tavern Keeper: [placeholder]

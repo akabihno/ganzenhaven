@@ -1,0 +1,31 @@
+{
+  "_comment": "Who speaks with which ElevenLabs voice. Lines are matched to characters by the names in translations/ui.csv (char_<id>); lines without a speaker are the author's ('narrator'). 'direction' is an eleven_v3 audio tag put in front of every line; 'expressions' override it for lines tagged 'Name [expression]:'; 'wordless' is what a line with no letters ('...') is spoken as. Keep tags in English for every language.",
+  "model": "eleven_v3",
+  "output_format": "mp3_44100_128",
+  "skip_lines_containing": [
+    "[placeholder",
+    "[заглушка"
+  ],
+  "voices": {
+    "seagull": {
+      "voice_id": "pFZP5JQG7iQjIQuC4Bku",
+      "name": "Lily",
+      "direction": "[weary, sarcastic]",
+      "expressions": {
+        "tilt": "[curious, sceptical]"
+      },
+      "wordless": "[exasperated sigh] Hmph."
+    },
+    "narrator": {
+      "voice_id": "pqHfZKP75CvOlQylNhV4",
+      "name": "Bill",
+      "direction": "[calm, storytelling]"
+    },
+    "black_cat": {
+      "voice_id": "CwhRBWXzGAHq8TQ4Fs17",
+      "name": "Roger",
+      "direction": "[low, knowing, unhurried]",
+      "wordless": "[slow, unimpressed] Mrrr."
+    }
+  }
+}

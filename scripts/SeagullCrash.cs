@@ -11,15 +11,27 @@ using System.Collections.Generic;
 /// <para>Everything runs off one clock, so the shot is identical on every run, which is what
 /// Movie Maker needs. With Movie Maker on, the scene quits by itself when the shot ends so
 /// the file is finalised; otherwise it loops.</para>
-/// <para>The Meshy seagull is one static mesh with no rig, so the flight is sold with
-/// lopsided banking, dips and a squash "effort" pulse instead of wing beats.</para>
-/// <para>The room itself (window, shutters, materials, props, fire) is dressed by
-/// <see cref="OfficeRestyle"/>.</para>
+/// <para>Two seagull models share one pivot: a rigged flying gull (wings spread, rig built by
+/// tools/blender_rig_seagull.py) whose wing bones are driven here, and the standing
+/// broken-winged gull it turns into at the moment it hits the floor, hidden by the dust and
+/// feathers. In flight the good wing pumps hard and the broken right wing droops and flails;
+/// the wings tuck up into a V to fit through the arch.</para>
+/// <para>The room itself (window, glass, shutters, materials, props, fire) is dressed by
+/// <see cref="OfficeRestyle"/>; the glass breaks into physics shards as the bird hits it.</para>
+/// <para>Sound is positional, on the Sfx bus (files in audio/sfx): harbour fog and the hearth
+/// loop throughout; the gull's cry as it comes, the glass, the shutter, the thud and roll,
+/// and its indignant squawk on getting up are cued off the clock.</para>
 /// </remarks>
 public partial class SeagullCrash : Node3D
 {
+	/// <summary>The shot is over (played inside the game with <see cref="Loop"/> off).</summary>
+	[Signal] public delegate void FinishedEventHandler();
+
 	/// <summary>Standing height of the seagull in metres.</summary>
 	[Export] public float SeagullHeight { get; set; } = 0.5f;
+
+	/// <summary>Wingspan of the flying gull in metres.</summary>
+	[Export] public float FlyingWingspan { get; set; } = 1.35f;
 
 	/// <summary>Meshy exports face +Z; Godot's forward is -Z.</summary>
 	[Export] public float ModelYawDegrees { get; set; } = 180f;
@@ -64,13 +76,19 @@ public partial class SeagullCrash : Node3D
 		WindowPoint + new Vector3(FallVelocity.X, 0f, FallVelocity.Z).Normalized() * 1.6f,
 	};
 
-	private Node3D _bird, _model, _shutter;
+	private Node3D _bird, _model, _flyer, _shutter;
+	private OfficeRestyle _office;
+	private readonly List<(float Time, AudioStreamPlayer3D Player)> _cues = new();
+	private int _nextCue;
+	private Skeleton3D _wings;
+	private readonly Dictionary<string, (int Bone, Quaternion RestRotation, Vector3 Axis)> _wingBones = new();
+	private float _flapPhase;
 	private Camera3D _camera;
 	private CpuParticles3D _windowFeathers, _impactFeathers, _impactDust;
 	private readonly List<Vector3> _contactPoints = new();
 
 	private double _clock;
-	private bool _windowBurstDone, _impactDone;
+	private bool _windowBurstDone, _impactDone, _finished;
 	private Vector3 _look = WindowCentre;
 	private float _shake;
 	private Basis _restBasis;
@@ -82,12 +100,15 @@ public partial class SeagullCrash : Node3D
 		_camera = GetNode<Camera3D>("PlayerCamera");
 		_camera.MakeCurrent();
 
-		_shutter = GetNode<OfficeRestyle>("OfficeRestyle").RightShutter;
+		_office = GetNode<OfficeRestyle>("OfficeRestyle");
+		_shutter = _office.RightShutter;
 		PrepareSeagull();
+		PrepareFlyer();
 		_windowFeathers = MakeFeathers(new Vector3(0f, 0.1f, 1f), 70f, 0.25f);
 		_impactFeathers = MakeFeathers(Vector3.Up, 75f, 0.2f);
 		_impactDust = MakeDust();
 		PrecomputeRest();
+		PrepareSound();
 		Restart();
 	}
 
@@ -98,10 +119,17 @@ public partial class SeagullCrash : Node3D
 
 		if (t > TEnd)
 		{
-			if (OS.HasFeature("movie"))
+			// Rendered on its own with Movie Maker: stop so the file is finalised.
+			// (Inside the game Loop is off and the game takes over on Finished.)
+			if (Loop && OS.HasFeature("movie"))
 			{
 				GetTree().Quit();
 				return;
+			}
+			if (!Loop && !_finished)
+			{
+				_finished = true;
+				EmitSignal(SignalName.Finished);
 			}
 			if (Loop && t > TEnd + LoopPause)
 			{
@@ -110,7 +138,9 @@ public partial class SeagullCrash : Node3D
 			}
 		}
 
-		UpdateSeagull(t);
+		UpdateGlass(t);
+		UpdateSound(t);
+		UpdateSeagull(t, (float)delta);
 		UpdateShutter(t);
 		UpdateCamera(t, (float)delta);
 	}
@@ -121,15 +151,101 @@ public partial class SeagullCrash : Node3D
 		_windowBurstDone = _impactDone = false;
 		_look = WindowCentre;
 		_shake = 0f;
+		_flapPhase = 0f;
+		_glassBroken = false;
+		_office.ResetGlass();
+		_nextCue = 0;
+	}
+
+	// ---------------------------------------------------------------- glass and sound
+
+	private const float TShatter = TWindow - 0.05f;   // beak meets the glass, set back in the reveal
+	private bool _glassBroken;
+
+	private void UpdateGlass(float t)
+	{
+		if (_glassBroken || t < TShatter)
+			return;
+		_glassBroken = true;
+		_office.ShatterGlass(FallVelocity.Normalized() * 3.2f);
+	}
+
+	private void PrepareSound()
+	{
+		Vector3 window = WindowPoint;
+		Loop3D("harbour_fog_loop", new Vector3(0.0f, 1.7f, -5.6f), -3f, 6f);
+		Loop3D("hearth_fire_loop", _office.FirePosition, -2f, 1.5f);
+
+		Cue(0.1f, "gull_approach", _bird, 2f, 18f);
+		Cue(TShatter, "glass_shatter", window, 9f, 4f);
+		Cue(TWindow + 0.05f, "shutter_bang", _shutter.GlobalPosition + new Vector3(-0.4f, 0f, 0f), -2f, 2f);
+		Cue(TWindow + FallTime - 0.02f, "bird_thud_tumble", _bird, 0f, 2f);
+		Cue(TGetUp + 0.1f, "gull_indignant", _bird, -1f, 2f);
+		_cues.Sort((a, b) => a.Time.CompareTo(b.Time));
+	}
+
+	private void UpdateSound(float t)
+	{
+		while (_nextCue < _cues.Count && t >= _cues[_nextCue].Time)
+			_cues[_nextCue++].Player.Play();
+	}
+
+	private AudioStreamPlayer3D Player(string id, float volumeDb, float unitSize)
+	{
+		var stream = GD.Load<AudioStream>($"res://audio/sfx/{id}.ogg");
+		if (stream == null)
+			GD.PushWarning($"Missing sound audio/sfx/{id}.ogg");
+		return new AudioStreamPlayer3D
+		{
+			Name = id,
+			Stream = stream,
+			Bus = "Sfx",
+			VolumeDb = volumeDb,
+			UnitSize = unitSize,
+			AttenuationFilterCutoffHz = 9000f,
+			DopplerTracking = AudioStreamPlayer3D.DopplerTrackingEnum.Disabled,
+		};
+	}
+
+	private void Loop3D(string id, Vector3 at, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		if (player.Stream is AudioStreamOggVorbis ogg)
+			ogg.Loop = true;
+		player.Position = at;
+		player.Autoplay = true;
+		AddChild(player);
+	}
+
+	/// <summary>A one-shot at a fixed point.</summary>
+	private void Cue(float time, string id, Vector3 at, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		player.Position = at;
+		AddChild(player);
+		_cues.Add((time, player));
+	}
+
+	/// <summary>A one-shot that travels with a node (the bird).</summary>
+	private void Cue(float time, string id, Node3D follow, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		follow.AddChild(player);
+		_cues.Add((time, player));
+	}
+
+	public override void _ExitTree()
+	{
+		foreach (var (_, player) in _cues)
+			player.Stop();
 	}
 
 	// ---------------------------------------------------------------- seagull motion
 
-	private void UpdateSeagull(float t)
+	private void UpdateSeagull(float t, float dt)
 	{
 		Vector3 position;
 		Basis basis;
-		Vector3 squash = Vector3.One;
 
 		if (t < TWindow)
 		{
@@ -146,14 +262,20 @@ public partial class SeagullCrash : Node3D
 			position += right * (0.45f * Mathf.Sin(t * 2.1f) * k);
 			position.Y += (-0.5f * Mathf.Pow(Mathf.Sin(t * 1.7f), 2f) + 0.15f * Mathf.Sin(t * 7.5f)) * k;
 
-			float bank = (0.35f + 0.45f * Mathf.Sin(t * 6.8f)) * k;
-			float pitch = 0.18f * Mathf.Sin(t * 6.8f + 1.2f) * k;
+			// Wing beats: faster as it gets desperate; the body heaves up on each
+			// down-stroke and rolls toward the bad wing.
+			_flapPhase += Mathf.Tau * (2.6f + 1.0f * s) * dt;
+			position.Y += 0.06f * Mathf.Cos(_flapPhase) * k;
+			float bank = (0.3f + 0.2f * Mathf.Sin(_flapPhase + 0.6f) + 0.25f * Mathf.Sin(t * 2.3f)) * k;
+			float pitch = 0.12f * Mathf.Sin(_flapPhase + 1.2f) * k;
 			basis = Basis.LookingAt(flat, Vector3.Up)
 				* new Basis(Vector3.Back, bank)
 				* new Basis(Vector3.Right, pitch);
 
-			float effort = Mathf.Sin(t * 13f) * k;
-			squash = new Vector3(1f + 0.07f * effort, 1f - 0.06f * effort, 1f);
+			// Last stretch: wings swept up into a V to squeeze through the arch.
+			float tuck = Smooth(TWindow - 0.4f, TWindow - 0.08f, t);
+			PoseWings(FlapPose(_flapPhase), TuckPose, tuck);
+			ShowFlyer(true);
 		}
 		else
 		{
@@ -170,7 +292,10 @@ public partial class SeagullCrash : Node3D
 
 			if (tau < FallTime)
 			{
-				// Out of steam: ballistic arc, tumbling nose-over.
+				// Out of steam: ballistic arc, tumbling nose-over, wings flailing.
+				_flapPhase += Mathf.Tau * 3.4f * dt;
+				PoseWings(TuckPose, FlailPose(_flapPhase), Smooth(0f, 0.15f, tau));
+				ShowFlyer(true);
 				position = WindowPoint + FallVelocity * tau + 0.5f * Gravity * tau * tau * Vector3.Down;
 				basis = facing * new Basis(Vector3.Back, wobble) * new Basis(Vector3.Right, -9f * tau);
 				position.Y = Mathf.Max(position.Y, ContactHeight(basis));
@@ -178,6 +303,7 @@ public partial class SeagullCrash : Node3D
 			else if (tau < FallTime + BounceTime)
 			{
 				float b = tau - FallTime;
+				ShowFlyer(false);
 				if (!_impactDone)
 				{
 					_impactDone = true;
@@ -195,6 +321,7 @@ public partial class SeagullCrash : Node3D
 			}
 			else if (tau < FallTime + BounceTime + RollTime)
 			{
+				ShowFlyer(false);
 				// Rolling along the boards, losing speed, twisting toward its bad side;
 				// in the last stretch it flops over onto its back.
 				float r = tau - FallTime - BounceTime;
@@ -215,6 +342,7 @@ public partial class SeagullCrash : Node3D
 			}
 			else if (t < TGetUp)
 			{
+				ShowFlyer(false);
 				// Flat on its back, dazed. A couple of feeble twitches.
 				basis = _restBasis;
 				float twitch = Envelope(t, 6.9f, 0.35f) * 0.06f * Mathf.Sin(t * 55f)
@@ -224,6 +352,7 @@ public partial class SeagullCrash : Node3D
 			}
 			else
 			{
+				ShowFlyer(false);
 				// Flips itself upright with a little hop, then stands there, woozy.
 				float w = Smooth(0f, 1f, (t - TGetUp) / GetUpTime);
 				Basis upright = UprightFacingCamera(_restPosition);
@@ -236,7 +365,7 @@ public partial class SeagullCrash : Node3D
 			}
 		}
 
-		_bird.Transform = new Transform3D(basis * Basis.FromScale(squash), position);
+		_bird.Transform = new Transform3D(basis, position);
 	}
 
 	private Vector3 LandingPoint()
@@ -372,6 +501,98 @@ public partial class SeagullCrash : Node3D
 				for (int i = 0; i < verts.Length; i += stride)
 					_contactPoints.Add(modelTransform * (toModel * verts[i]));
 			}
+		}
+	}
+
+	// ---------------------------------------------------------------- wings
+
+	/// <summary>Up-angles in radians: left inner, left outer, right inner, right outer.
+	/// The right wing is the broken one.</summary>
+	private readonly record struct WingPose(float LeftInner, float LeftOuter, float RightInner, float RightOuter)
+	{
+		public WingPose Lerp(WingPose b, float w) => new(
+			Mathf.Lerp(LeftInner, b.LeftInner, w), Mathf.Lerp(LeftOuter, b.LeftOuter, w),
+			Mathf.Lerp(RightInner, b.RightInner, w), Mathf.Lerp(RightOuter, b.RightOuter, w));
+	}
+
+	private static readonly WingPose TuckPose = new(1.35f, 0.35f, 1.15f, 0.2f);
+
+	/// <summary>Good wing: big, even beats with the tip lagging. Broken wing: hangs low,
+	/// twitches out of step and never gets above the body.</summary>
+	private static WingPose FlapPose(float phase) => new(
+		0.15f + 0.8f * Mathf.Sin(phase),
+		0.05f + 0.5f * Mathf.Sin(phase - 0.8f),
+		-0.45f + 0.28f * Mathf.Sin(phase + 0.5f) + 0.12f * Mathf.Sin(phase * 2.7f),
+		-0.7f + 0.3f * Mathf.Sin(phase * 1.9f + 1f));
+
+	private static WingPose FlailPose(float phase) => new(
+		0.3f + 0.9f * Mathf.Sin(phase * 1.3f),
+		0.6f * Mathf.Sin(phase * 1.3f - 1f),
+		-0.2f + 0.7f * Mathf.Sin(phase * 1.1f + 2f),
+		-0.5f + 0.5f * Mathf.Sin(phase * 2f));
+
+	private void PoseWings(WingPose a, WingPose b, float w)
+	{
+		if (_wings == null)
+			return;
+		var p = a.Lerp(b, w);
+		SetWing("wing_l_inner", p.LeftInner, +1f);
+		SetWing("wing_l_outer", p.LeftOuter, +1f);
+		SetWing("wing_r_inner", p.RightInner, -1f);
+		SetWing("wing_r_outer", p.RightOuter, -1f);
+	}
+
+	/// <summary>Raises a wing bone by <paramref name="up"/> radians about the body's
+	/// forward axis. The wings mirror each other, so the right side turns the other way.</summary>
+	private void SetWing(string name, float up, float side)
+	{
+		if (!_wingBones.TryGetValue(name, out var bone))
+			return;
+		_wings.SetBonePoseRotation(bone.Bone, bone.RestRotation * new Quaternion(bone.Axis, up * side));
+	}
+
+	private void ShowFlyer(bool flying)
+	{
+		if (_flyer == null)
+			return;
+		_flyer.Visible = flying;
+		_model.Visible = !flying;
+	}
+
+	private void PrepareFlyer()
+	{
+		_flyer = _bird.GetNodeOrNull<Node3D>("FlyingModel");
+		if (_flyer == null)
+			return;
+
+		Aabb bounds = default;
+		bool first = true;
+		foreach (var node in _flyer.FindChildren("*", "MeshInstance3D", true, false))
+		{
+			var mi = (MeshInstance3D)node;
+			Aabb box = _flyer.GlobalTransform.AffineInverse() * mi.GlobalTransform * mi.GetAabb();
+			bounds = first ? box : bounds.Merge(box);
+			first = false;
+		}
+		float scale = FlyingWingspan / bounds.Size.X;
+		Basis b = new Basis(Vector3.Up, Mathf.DegToRad(ModelYawDegrees)).Scaled(Vector3.One * scale);
+		_flyer.Transform = new Transform3D(b, -(b * bounds.GetCenter()));
+
+		_wings = _flyer.FindChildren("*", "Skeleton3D", true, false) is { Count: > 0 } found ? (Skeleton3D)found[0] : null;
+		if (_wings == null)
+			return;
+
+		// The model's forward (+Z in its own space) expressed in the skeleton's space; each
+		// wing bone flaps about that axis, taken into the bone's own frame.
+		Vector3 forward = (_wings.GlobalBasis.Inverse() * _flyer.GlobalBasis * Vector3.Back).Normalized();
+		foreach (var name in new[] { "wing_l_inner", "wing_l_outer", "wing_r_inner", "wing_r_outer" })
+		{
+			int bone = _wings.FindBone(name);
+			if (bone < 0)
+				continue;
+			Basis globalRest = _wings.GetBoneGlobalRest(bone).Basis.Orthonormalized();
+			Vector3 axis = (globalRest.Inverse() * forward).Normalized();
+			_wingBones[name] = (bone, _wings.GetBoneRest(bone).Basis.GetRotationQuaternion(), axis);
 		}
 	}
 

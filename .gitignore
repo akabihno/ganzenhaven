@@ -15,7 +15,20 @@ assets/models/seagull_advisor_attempt*/
 
 # Generation logs from tools/meshy_*.py
 assets/**/*.log
-# Godot extracts the textures embedded in each .glb on import; it regenerates them
-assets/models/**/model_*.png*
-assets/models/**/model_*.jpg*
+# Godot extracts the textures embedded in each .glb on import (<model>_0.png,
+# <model>_normal.png, <model>_Image_0.jpg …) and regenerates them, with their .import files.
+# Everything else Godot makes next to an asset (*.import, *.uid) is committed.
+assets/models/**/*_Image_*
+assets/models/**/*_normal.png*
+assets/models/**/*_[0-9].png*
+assets/models/**/*_[0-9].jpg*
 assets/models/**/*.fbx.import
+
+# IDE settings
+.idea/
+
+# Godot generates these from translations/ui.csv on import
+translations/*.translation
+
+# Generation logs from tools/elevenlabs_*.py
+audio/**/*.log

@@ -1,0 +1,12 @@
+# PLACEHOLDER — replace with your dialogue.
+@show seagull
+@if tavern_keeper_dead
+  Seagull: [placeholder — after the Tavern Keeper's death]
+@else
+  Seagull: Here it is again, the same pitying head tilt
+  * Wanna grab a bite?
+    Seagull: Maybe, but I will not tolerate such familiarity.
+    * I beg your pardon. Can I offer you some fish?
+        Seagull [tilt]: Do you _have_ fish?
+        $set fish_required
+        $journal find_fish

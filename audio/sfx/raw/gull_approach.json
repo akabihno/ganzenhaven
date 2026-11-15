@@ -1,0 +1,7 @@
+{
+  "text": "A seagull flying fast towards the listener, wings flapping hard and frantically, squawking in panic, getting louder and closer.",
+  "loop": false,
+  "prompt_influence": 0.5,
+  "model_id": "eleven_text_to_sound_v3",
+  "duration_seconds": 4.5
+}
