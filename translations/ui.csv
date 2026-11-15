@@ -5,6 +5,12 @@ menu_quit,Quit,Выход
 btn_map,Map,Карта
 btn_back,Back,Назад
 btn_menu,Menu,Меню
+btn_journal,Journal,Журнал
+btn_close,Close,Закрыть
+journal_title,Journal,Журнал
+journal_empty,Nothing written yet.,Пока ничего не записано.
+journal_new,New in the journal,Новое в журнале
+journal_done,Done,Сделано
 map_title,Ganzenhaven,Ганзенхавен
 loc_office,Harbourmaster's Office,Контора начальника порта
 loc_harbor,Harbour,Гавань

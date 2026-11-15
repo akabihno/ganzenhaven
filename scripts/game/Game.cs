@@ -33,6 +33,7 @@ public partial class Game : Node
 
 	public IStage CurrentStage { get; private set; }
 	public DialogueBox Dialogue { get; private set; }
+	public GameHud Hud { get; private set; }
 
 	private CanvasLayer _fadeLayer;
 	private ColorRect _fade;
@@ -50,6 +51,15 @@ public partial class Game : Node
 
 		Dialogue = new DialogueBox { Name = "DialogueBox" };
 		AddChild(Dialogue);
+		// Whatever a conversation changed (flags, journal) is kept even without travelling.
+		Dialogue.Finished += () =>
+		{
+			if (CurrentStage != null)
+				GameState.Instance.Save();
+		};
+
+		Hud = new GameHud { Name = "Hud" };
+		AddChild(Hud);
 
 		_fadeLayer = new CanvasLayer { Layer = 100 };
 		AddChild(_fadeLayer);
@@ -87,7 +97,12 @@ public partial class Game : Node
 		GoToLocation(GameState.Instance.Location);
 	}
 
-	public void GoToMenu() => SwitchTo(MenuScene);
+	public void GoToMenu()
+	{
+		if (GetTree().CurrentScene is LocationScreen or MapScreen)
+			GameState.Instance.Save();
+		SwitchTo(MenuScene);
+	}
 
 	public void GoToMap() => SwitchTo(MapScene);
 
@@ -201,6 +216,7 @@ public partial class Game : Node
 		var old = tree.CurrentScene;
 		tree.Root.AddChild(scene);
 		tree.CurrentScene = scene;
+		Hud?.SetGameScreen(scene is LocationScreen or MapScreen);
 		old?.QueueFree();
 	}
 

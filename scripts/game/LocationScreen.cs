@@ -106,8 +106,9 @@ public partial class LocationScreen : Control, IStage
 	{
 		_mapButton = new Button { Name = "MapButton", Text = Tr("btn_map"), CustomMinimumSize = new Vector2(200, 64) };
 		_mapButton.SetAnchorsPreset(LayoutPreset.TopRight);
-		_mapButton.OffsetLeft = -240;
-		_mapButton.OffsetRight = -40;
+		// Left of the Journal / Menu buttons that GameHud puts on every screen.
+		_mapButton.OffsetLeft = GameHud.ScreenButtonRight - 200;
+		_mapButton.OffsetRight = GameHud.ScreenButtonRight;
 		_mapButton.OffsetTop = 32;
 		_mapButton.OffsetBottom = 96;
 		_mapButton.AddThemeFontSizeOverride("font_size", 34);

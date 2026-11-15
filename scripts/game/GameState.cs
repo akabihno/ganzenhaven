@@ -10,6 +10,8 @@ using System.Text.Json;
 /// <para>Dialogue scripts read and write it through <c>$set</c>, <c>$unset</c>, <c>$add</c> and
 /// <c>@if</c>. The game is split in two acts by one flag, <see cref="TavernKeeperDead"/>:
 /// before it people behave more or less sanely, after it the harbour comes apart.</para>
+/// <para>Also holds the journal: entries a script adds with <c>$journal id</c> and ticks off
+/// with <c>$journal done id</c>; their text lives in dialogs/&lt;language&gt;/journal.txt.</para>
 /// <para>Saved as JSON in user://save.json; the language choice is kept separately in
 /// user://settings.cfg so it survives a new game.</para>
 /// </remarks>
@@ -22,11 +24,19 @@ public partial class GameState : Node
 
 	[Signal] public delegate void ChangedEventHandler();
 	[Signal] public delegate void LanguageChangedEventHandler(string language);
+	/// <summary>A journal entry was added (<paramref name="done"/> false) or completed (true).</summary>
+	[Signal] public delegate void JournalUpdatedEventHandler(string id, bool done);
 
 	public static GameState Instance { get; private set; }
 
 	private readonly HashSet<string> _flags = new();
 	private readonly Dictionary<string, double> _vars = new();
+	private readonly List<JournalEntry> _journal = new();
+
+	public sealed record JournalEntry(string Id, bool Done);
+
+	/// <summary>Journal entries in the order they were added.</summary>
+	public IReadOnlyList<JournalEntry> Journal => _journal;
 
 	/// <summary>Location id the player is at (also where Continue takes them).</summary>
 	public string Location { get; set; } = "office";
@@ -68,7 +78,8 @@ public partial class GameState : Node
 
 	/// <summary>
 	/// Evaluates a condition as written in scripts and in the editor's ShowIf / HideIf
-	/// fields: <c>flag</c>, <c>!flag</c>, <c>name &gt;= 3</c>, joined with <c>and</c> / <c>or</c>
+	/// fields: <c>flag</c>, <c>!flag</c>, <c>name &gt;= 3</c>, <c>journal:id</c> (entry open),
+	/// <c>done:id</c> (entry ticked off), joined with <c>and</c> / <c>or</c>
 	/// (<c>and</c> binds tighter). An empty condition is true.
 	/// </summary>
 	public bool Check(string condition)
@@ -118,7 +129,47 @@ public partial class GameState : Node
 			};
 		}
 
-		return term.StartsWith('!') ? !HasFlag(term[1..].Trim()) : HasFlag(term);
+		bool negate = term.StartsWith('!');
+		string name = negate ? term[1..].Trim() : term;
+		bool result;
+		if (name.StartsWith("journal:"))
+			result = _journal.Exists(e => e.Id == name[8..].Trim() && !e.Done);
+		else if (name.StartsWith("done:"))
+			result = _journal.Exists(e => e.Id == name[5..].Trim() && e.Done);
+		else
+			result = HasFlag(name);
+		return negate ? !result : result;
+	}
+
+	// ---------------------------------------------------------------- journal
+
+	public void JournalAdd(string id)
+	{
+		if (string.IsNullOrEmpty(id) || _journal.Exists(e => e.Id == id))
+			return;
+		_journal.Add(new JournalEntry(id, false));
+		EmitSignal(SignalName.JournalUpdated, id, false);
+		EmitSignal(SignalName.Changed);
+	}
+
+	/// <summary>Ticks an entry off (adding it first if the script never added it).</summary>
+	public void JournalComplete(string id)
+	{
+		int i = _journal.FindIndex(e => e.Id == id);
+		if (i >= 0 && _journal[i].Done)
+			return;
+		if (i >= 0)
+			_journal[i] = _journal[i] with { Done = true };
+		else
+			_journal.Add(new JournalEntry(id, true));
+		EmitSignal(SignalName.JournalUpdated, id, true);
+		EmitSignal(SignalName.Changed);
+	}
+
+	public void JournalRemove(string id)
+	{
+		if (_journal.RemoveAll(e => e.Id == id) > 0)
+			EmitSignal(SignalName.Changed);
 	}
 
 	// ---------------------------------------------------------------- language
@@ -154,17 +205,18 @@ public partial class GameState : Node
 	{
 		_flags.Clear();
 		_vars.Clear();
+		_journal.Clear();
 		Location = "office";
 		EmitSignal(SignalName.Changed);
 	}
 
 	public static bool HasSave => FileAccess.FileExists(SavePath);
 
-	private record SaveData(string Location, List<string> Flags, Dictionary<string, double> Vars);
+	private record SaveData(string Location, List<string> Flags, Dictionary<string, double> Vars, List<JournalEntry> Journal);
 
 	public void Save()
 	{
-		var data = new SaveData(Location, new List<string>(_flags), new Dictionary<string, double>(_vars));
+		var data = new SaveData(Location, new List<string>(_flags), new Dictionary<string, double>(_vars), new List<JournalEntry>(_journal));
 		using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
 		file?.StoreString(JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
 	}
@@ -182,6 +234,8 @@ public partial class GameState : Node
 		_vars.Clear();
 		foreach (var (k, v) in data.Vars ?? new Dictionary<string, double>())
 			_vars[k] = v;
+		_journal.Clear();
+		_journal.AddRange(data.Journal ?? new List<JournalEntry>());
 		Location = string.IsNullOrEmpty(data.Location) ? "office" : data.Location;
 		EmitSignal(SignalName.Changed);
 		return true;

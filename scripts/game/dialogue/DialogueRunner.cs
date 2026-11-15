@@ -144,6 +144,17 @@ public sealed class DialogueRunner
 					Warn(cmd, frame, "$add name <number>");
 				return null;
 			}
+			case "$journal":
+			{
+				// "$journal id", "$journal done id", "$journal remove id"
+				string verb = cmd.Args.Length > 1 ? cmd.Args[0] : "add";
+				string id = cmd.Args.Length > 0 ? cmd.Args[^1] : "";
+				if (verb == "done") state.JournalComplete(id);
+				else if (verb == "remove") state.JournalRemove(id);
+				else if (verb == "add") state.JournalAdd(id);
+				else Warn(cmd, frame, "$journal id | $journal done id | $journal remove id");
+				return null;
+			}
 			case "label":
 				return null;
 			case "goto":

@@ -1,0 +1,3 @@
+# Journal entries: "id: text". Scripts add them with "$journal id",
+# tick them off with "$journal done id". Conditions: "journal:id" (open), "done:id" (finished).
+find_fish: Find fish

@@ -5,7 +5,8 @@
 @else
   Seagull: Here it is again, the same pitying head tilt
   * Wanna grab a bite?
-  Seagull: Maybe, but I will not tolerate such familiarity.
+    Seagull: Maybe, but I will not tolerate such familiarity.
   * I beg your pardon. Can I offer you some fish?
-  Seagull: Do you _have_ fish?
-  $set fish_required
+    Seagull: Do you _have_ fish?
+    $set fish_required
+    $journal find_fish

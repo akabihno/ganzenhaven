@@ -24,7 +24,8 @@ The fog thickens.                                          narration (shown in i
 ```
 
 A speaker line is `Name: text`. The name is whatever you write; it is shown as is, so the
-Russian file writes `Рыбак:`. Text may use BBCode: `[i]…[/i]`, `[b]…[/b]`, `[color=red]…[/color]`.
+Russian file writes `Рыбак:`. `_word_` is shown in italics; BBCode works too: `[i]…[/i]`,
+`[b]…[/b]`, `[color=red]…[/color]`.
 `{name}` inserts the value of a variable.
 
 ## Choices and conditions (indent with spaces)
@@ -36,6 +37,12 @@ Russian file writes `Рыбак:`. Text may use BBCode: `[i]…[/i]`, `[b]…[/b
   Fisherman: These ones do.
   $set fish_suspicious
 * Ask about the tavern  @if !tavern_keeper_dead      option only shown while the condition holds
+```
+
+Everything that should happen after picking an option must be indented under it. A line at
+the same level as the `*` lines ends the choice: it runs whichever option was picked.
+
+```
 
 @if tavern_keeper_dead
   Fisherman: ...and now they whisper.
@@ -45,7 +52,8 @@ Russian file writes `Рыбак:`. Text may use BBCode: `[i]…[/i]`, `[b]…[/b
   Fisherman: Morning.
 ```
 
-Conditions: `flag`, `!flag`, `coins >= 3` (also `<= == != > <`), combined with `and` / `or`.
+Conditions: `flag`, `!flag`, `coins >= 3` (also `<= == != > <`), `journal:find_fish` (entry
+open), `done:find_fish` (entry ticked off), combined with `and` / `or`.
 
 ## Story state
 
@@ -53,6 +61,19 @@ Conditions: `flag`, `!flag`, `coins >= 3` (also `<= == != > <`), combined with `
 $set flag            $unset flag
 $set coins = 3       $add coins 1      $add coins -2
 ```
+
+## Journal
+
+```
+$journal find_fish           add an entry (a notice pops up: "New in the journal: …")
+$journal done find_fish      tick it off (shown struck through)
+$journal remove find_fish
+```
+
+The text of each entry lives in `dialogs/en/journal.txt` and `dialogs/ru/journal.txt`, one
+`id: text` per line, so the journal follows the language setting.
+
+## The two acts
 
 **`tavern_keeper_dead`** is the one flag the game itself knows: setting it starts the second
 half. Locations then use `<background>_after.png` when one exists, and characters/hotspots

@@ -29,17 +29,13 @@ public partial class MapScreen : Control
 
 		_back = new Button { Text = Tr("btn_back"), CustomMinimumSize = new Vector2(200, 64) };
 		_back.SetAnchorsPreset(LayoutPreset.TopRight);
-		_back.OffsetLeft = -240;
-		_back.OffsetRight = -40;
+		_back.OffsetLeft = GameHud.ScreenButtonRight - 200;
+		_back.OffsetRight = GameHud.ScreenButtonRight;
 		_back.OffsetTop = 32;
 		_back.OffsetBottom = 96;
 		_back.Pressed += Back;
 		AddChild(_back);
 
-		var menu = new Button { Text = Tr("btn_menu"), CustomMinimumSize = new Vector2(200, 64) };
-		menu.Position = new Vector2(40, 32);
-		menu.Pressed += () => Game.Instance.GoToMenu();
-		AddChild(menu);
 	}
 
 	private void Back() => Game.Instance.GoToLocation(GameState.Instance.Location);

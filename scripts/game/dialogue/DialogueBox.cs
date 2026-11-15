@@ -147,8 +147,13 @@ public partial class DialogueBox : CanvasLayer
 		}
 	}
 
+	// _word_ in a script is shown in italics (BBCode [i] works too).
+	private static readonly System.Text.RegularExpressions.Regex Underscored =
+		new(@"(?<![\w])_(?<t>[^_\n]+?)_(?![\w])");
+
 	private void ShowLine(string speaker, string text)
 	{
+		text = Underscored.Replace(text, "[i]${t}[/i]");
 		_panel.Show();
 		_speaker.Text = speaker;
 		_speaker.Visible = speaker.Length > 0;
