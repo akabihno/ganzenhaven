@@ -1,0 +1,7 @@
+{
+  "task_id": "01a1d6f4-5328-77ee-b589-b02b53c4911c",
+  "prompt": "Seamless tileable texture, perfectly flat orthographic straight-on view, even flat diffuse lighting with no shadows, no perspective, no vignette, high detail PBR albedo map. A medieval rough fieldstone wall, irregular grey-brown stones and mortar, partly covered with old patchy flaking cream lime plaster, soot and damp stains.",
+  "model": "nano-banana-2",
+  "aspect": "1:1",
+  "consumed_credits": 6
+}

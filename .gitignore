@@ -1,3 +1,21 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Secrets
+.env
+
+# macOS
+.DS_Store
+
+# Meshy by-products: the .glb embeds its textures; FBX copies and loose maps are regenerable
+assets/models/**/*.fbx
+assets/models/**/texture_*.png*
+assets/models/seagull_advisor_attempt*/
+
+# Generation logs from tools/meshy_*.py
+assets/**/*.log
+# Godot extracts the textures embedded in each .glb on import; it regenerates them
+assets/models/**/model_*.png*
+assets/models/**/model_*.jpg*
+assets/models/**/*.fbx.import
