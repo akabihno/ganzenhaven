@@ -27,6 +27,9 @@ public partial class LocationScreen : Control, IStage
 	[Export] public string EnterScript { get; set; } = "";
 	[Export] public string EnterScriptIf { get; set; } = "";
 
+	/// <summary>Track from audio/music/; empty = same as <see cref="LocationId"/>.</summary>
+	[Export] public string MusicId { get; set; } = "";
+
 	/// <summary>The Map button is shown while this holds.</summary>
 	[Export] public string MapButtonIf { get; set; } = "map_unlocked";
 
@@ -34,6 +37,7 @@ public partial class LocationScreen : Control, IStage
 	private Control _sprites;
 	private Button _mapButton;
 	private readonly Dictionary<string, TextureRect> _shown = new();
+	private readonly Dictionary<string, string> _shownExpression = new();
 
 	public override void _Ready()
 	{
@@ -60,6 +64,7 @@ public partial class LocationScreen : Control, IStage
 
 		BuildHud();
 		Game.Instance.RegisterStage(this);
+		Game.Instance.Music.Play(string.IsNullOrEmpty(MusicId) ? LocationId : MusicId);
 		GameState.Instance.Changed += Refresh;
 		GameState.Instance.LanguageChanged += OnLanguageChanged;
 		Refresh();
@@ -160,6 +165,7 @@ public partial class LocationScreen : Control, IStage
 			CreateTween().TweenProperty(sprite, "modulate:a", 1f, 0.25f);
 		}
 		sprite.Texture = texture;
+		_shownExpression[id] = expression ?? "";
 
 		// Dialogue sprites stand large and up close.
 		Vector2 screen = GetViewportRect().Size;
@@ -175,11 +181,22 @@ public partial class LocationScreen : Control, IStage
 				spot.Visible = false;
 	}
 
+	public void SetLineExpression(string id, string expression)
+	{
+		if (string.IsNullOrEmpty(id) || !_shown.TryGetValue(id, out var sprite))
+			return;
+		string wanted = string.IsNullOrEmpty(expression) ? _shownExpression.GetValueOrDefault(id, "") : expression;
+		var texture = CharacterArt.Load(id, wanted);
+		if (texture != null)
+			sprite.Texture = texture;
+	}
+
 	public void HideCharacter(string id)
 	{
 		var ids = id == "all" || string.IsNullOrEmpty(id) ? new List<string>(_shown.Keys) : new List<string> { id };
 		foreach (var key in ids)
 		{
+			_shownExpression.Remove(key);
 			if (!_shown.Remove(key, out var sprite))
 				continue;
 			var tween = CreateTween();

@@ -16,8 +16,11 @@ using System.Collections.Generic;
 /// broken-winged gull it turns into at the moment it hits the floor, hidden by the dust and
 /// feathers. In flight the good wing pumps hard and the broken right wing droops and flails;
 /// the wings tuck up into a V to fit through the arch.</para>
-/// <para>The room itself (window, shutters, materials, props, fire) is dressed by
-/// <see cref="OfficeRestyle"/>.</para>
+/// <para>The room itself (window, glass, shutters, materials, props, fire) is dressed by
+/// <see cref="OfficeRestyle"/>; the glass breaks into physics shards as the bird hits it.</para>
+/// <para>Sound is positional, on the Sfx bus (files in audio/sfx): harbour fog and the hearth
+/// loop throughout; the gull's cry as it comes, the glass, the shutter, the thud and roll,
+/// and its indignant squawk on getting up are cued off the clock.</para>
 /// </remarks>
 public partial class SeagullCrash : Node3D
 {
@@ -74,6 +77,9 @@ public partial class SeagullCrash : Node3D
 	};
 
 	private Node3D _bird, _model, _flyer, _shutter;
+	private OfficeRestyle _office;
+	private readonly List<(float Time, AudioStreamPlayer3D Player)> _cues = new();
+	private int _nextCue;
 	private Skeleton3D _wings;
 	private readonly Dictionary<string, (int Bone, Quaternion RestRotation, Vector3 Axis)> _wingBones = new();
 	private float _flapPhase;
@@ -94,13 +100,15 @@ public partial class SeagullCrash : Node3D
 		_camera = GetNode<Camera3D>("PlayerCamera");
 		_camera.MakeCurrent();
 
-		_shutter = GetNode<OfficeRestyle>("OfficeRestyle").RightShutter;
+		_office = GetNode<OfficeRestyle>("OfficeRestyle");
+		_shutter = _office.RightShutter;
 		PrepareSeagull();
 		PrepareFlyer();
 		_windowFeathers = MakeFeathers(new Vector3(0f, 0.1f, 1f), 70f, 0.25f);
 		_impactFeathers = MakeFeathers(Vector3.Up, 75f, 0.2f);
 		_impactDust = MakeDust();
 		PrecomputeRest();
+		PrepareSound();
 		Restart();
 	}
 
@@ -130,6 +138,8 @@ public partial class SeagullCrash : Node3D
 			}
 		}
 
+		UpdateGlass(t);
+		UpdateSound(t);
 		UpdateSeagull(t, (float)delta);
 		UpdateShutter(t);
 		UpdateCamera(t, (float)delta);
@@ -142,6 +152,92 @@ public partial class SeagullCrash : Node3D
 		_look = WindowCentre;
 		_shake = 0f;
 		_flapPhase = 0f;
+		_glassBroken = false;
+		_office.ResetGlass();
+		_nextCue = 0;
+	}
+
+	// ---------------------------------------------------------------- glass and sound
+
+	private const float TShatter = TWindow - 0.05f;   // beak meets the glass, set back in the reveal
+	private bool _glassBroken;
+
+	private void UpdateGlass(float t)
+	{
+		if (_glassBroken || t < TShatter)
+			return;
+		_glassBroken = true;
+		_office.ShatterGlass(FallVelocity.Normalized() * 3.2f);
+	}
+
+	private void PrepareSound()
+	{
+		Vector3 window = WindowPoint;
+		Loop3D("harbour_fog_loop", new Vector3(0.0f, 1.7f, -5.6f), -3f, 6f);
+		Loop3D("hearth_fire_loop", _office.FirePosition, -2f, 1.5f);
+
+		Cue(0.1f, "gull_approach", _bird, 2f, 18f);
+		Cue(TShatter, "glass_shatter", window, 9f, 4f);
+		Cue(TWindow + 0.05f, "shutter_bang", _shutter.GlobalPosition + new Vector3(-0.4f, 0f, 0f), -2f, 2f);
+		Cue(TWindow + FallTime - 0.02f, "bird_thud_tumble", _bird, 0f, 2f);
+		Cue(TGetUp + 0.1f, "gull_indignant", _bird, -1f, 2f);
+		_cues.Sort((a, b) => a.Time.CompareTo(b.Time));
+	}
+
+	private void UpdateSound(float t)
+	{
+		while (_nextCue < _cues.Count && t >= _cues[_nextCue].Time)
+			_cues[_nextCue++].Player.Play();
+	}
+
+	private AudioStreamPlayer3D Player(string id, float volumeDb, float unitSize)
+	{
+		var stream = GD.Load<AudioStream>($"res://audio/sfx/{id}.ogg");
+		if (stream == null)
+			GD.PushWarning($"Missing sound audio/sfx/{id}.ogg");
+		return new AudioStreamPlayer3D
+		{
+			Name = id,
+			Stream = stream,
+			Bus = "Sfx",
+			VolumeDb = volumeDb,
+			UnitSize = unitSize,
+			AttenuationFilterCutoffHz = 9000f,
+			DopplerTracking = AudioStreamPlayer3D.DopplerTrackingEnum.Disabled,
+		};
+	}
+
+	private void Loop3D(string id, Vector3 at, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		if (player.Stream is AudioStreamOggVorbis ogg)
+			ogg.Loop = true;
+		player.Position = at;
+		player.Autoplay = true;
+		AddChild(player);
+	}
+
+	/// <summary>A one-shot at a fixed point.</summary>
+	private void Cue(float time, string id, Vector3 at, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		player.Position = at;
+		AddChild(player);
+		_cues.Add((time, player));
+	}
+
+	/// <summary>A one-shot that travels with a node (the bird).</summary>
+	private void Cue(float time, string id, Node3D follow, float volumeDb, float unitSize)
+	{
+		var player = Player(id, volumeDb, unitSize);
+		follow.AddChild(player);
+		_cues.Add((time, player));
+	}
+
+	public override void _ExitTree()
+	{
+		foreach (var (_, player) in _cues)
+			player.Stop();
 	}
 
 	// ---------------------------------------------------------------- seagull motion

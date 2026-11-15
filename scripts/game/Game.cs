@@ -34,6 +34,7 @@ public partial class Game : Node
 	public IStage CurrentStage { get; private set; }
 	public DialogueBox Dialogue { get; private set; }
 	public GameHud Hud { get; private set; }
+	public MusicPlayer Music { get; private set; }
 
 	private CanvasLayer _fadeLayer;
 	private ColorRect _fade;
@@ -46,8 +47,13 @@ public partial class Game : Node
 	public override void _Ready()
 	{
 		ProcessMode = ProcessModeEnum.Always;
+		// Closing the window goes through Quit() so audio is released first.
+		GetTree().AutoAcceptQuit = false;
 		UiTheme = BuildTheme();
 		GetTree().Root.Theme = UiTheme;
+
+		Music = new MusicPlayer { Name = "Music" };
+		AddChild(Music);
 
 		Dialogue = new DialogueBox { Name = "DialogueBox" };
 		AddChild(Dialogue);
@@ -157,6 +163,7 @@ public partial class Game : Node
 		}
 
 		_returnScene = GetTree().CurrentScene?.SceneFilePath;
+		Music.Play("");
 		await FadeTo(1f, 0.6f);
 
 		var scene = GD.Load<PackedScene>(path).Instantiate();
@@ -226,6 +233,25 @@ public partial class Game : Node
 		var tween = CreateTween();
 		tween.TweenProperty(_fade, "modulate:a", alpha, seconds);
 		await ToSignal(tween, Tween.SignalName.Finished);
+	}
+
+	/// <summary>
+	/// Quits after stopping music and voice. The audio thread only releases a stopped
+	/// stream on its next mix, so quitting straight away reports the tracks as leaked.
+	/// </summary>
+	public async void Quit()
+	{
+		Music.StopAll();
+		Dialogue.ReleaseAudio();
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		GetTree().Quit();
+	}
+
+	public override void _Notification(int what)
+	{
+		if (what == NotificationWMCloseRequest)
+			Quit();
 	}
 
 	// ---------------------------------------------------------------- input

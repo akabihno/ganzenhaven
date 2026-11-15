@@ -30,11 +30,16 @@ public partial class DialogueBox : CanvasLayer
 	private bool _busy;          // a wait / cutscene is in progress
 	private float _blink;
 	private Action<string, string[]> _onGameCommand;
+	private string _lineExpressionId = "";
+	private AudioStreamPlayer _voice;   // whose sprite a "Name [expression]:" line changed
 
 	public override void _Ready()
 	{
 		Layer = 50;
 		BuildUi();
+		_voice = new AudioStreamPlayer { Bus = "Voice" };
+		_voice.Finished += () => Game.Instance.Music.Duck(false);
+		AddChild(_voice);
 		Hide();
 	}
 
@@ -66,6 +71,8 @@ public partial class DialogueBox : CanvasLayer
 			return;
 		_runner = null;
 		_busy = false;
+		_lineExpressionId = "";
+		StopVoice();
 		Hide();
 		Game.Instance.CurrentStage?.OnDialogueEnded();
 		EmitSignal(SignalName.Finished);
@@ -75,6 +82,7 @@ public partial class DialogueBox : CanvasLayer
 
 	private void Advance()
 	{
+		StopVoice();
 		ClearChoices();
 		while (_runner != null && !_busy)
 		{
@@ -82,7 +90,9 @@ public partial class DialogueBox : CanvasLayer
 			switch (ev)
 			{
 				case DialogueRunner.SayEvent say:
+					ApplyLineExpression(say.Speaker, say.Expression);
 					ShowLine(say.Speaker, say.Text);
+					PlayVoice(say.VoicePath);
 					return;
 
 				case DialogueRunner.ChoiceEvent choice:
@@ -138,8 +148,10 @@ public partial class DialogueBox : CanvasLayer
 				_onGameCommand?.Invoke(name, args);
 				break;
 			case "music":
+				Game.Instance.Music.Play(Arg(0));
+				break;
 			case "sound":
-				GD.Print($"[dialogue] {cmd.Name} {cmd.Rest} (audio not wired up yet)");
+				GD.Print($"[dialogue] sound {cmd.Rest} (sound effects not wired up yet)");
 				break;
 			default:
 				GD.PushWarning($"{cmd.Path}:{cmd.Line}: unknown command @{cmd.Name}");
@@ -150,6 +162,28 @@ public partial class DialogueBox : CanvasLayer
 	// _word_ in a script is shown in italics (BBCode [i] works too).
 	private static readonly System.Text.RegularExpressions.Regex Underscored =
 		new(@"(?<![\w])_(?<t>[^_\n]+?)_(?![\w])");
+
+	/// <summary>"Seagull [tilt]: …" changes the seagull's sprite for that line; the next line
+	/// puts back whatever <c>@show</c> set.</summary>
+	private void ApplyLineExpression(string speaker, string expression)
+	{
+		var stage = Game.Instance.CurrentStage;
+		if (_lineExpressionId.Length > 0)
+		{
+			stage?.SetLineExpression(_lineExpressionId, "");
+			_lineExpressionId = "";
+		}
+		if (string.IsNullOrEmpty(expression))
+			return;
+		string id = CharacterArt.FindIdBySpeaker(speaker);
+		if (id.Length == 0)
+		{
+			GD.PushWarning($"Dialogue: no character called '{speaker}' for [{expression}]");
+			return;
+		}
+		stage?.SetLineExpression(id, expression);
+		_lineExpressionId = id;
+	}
 
 	private void ShowLine(string speaker, string text)
 	{
@@ -188,6 +222,37 @@ public partial class DialogueBox : CanvasLayer
 		_choices.Show();
 		if (_choices.GetChildCount() > 0)
 			((Control)_choices.GetChild(0)).CallDeferred(Control.MethodName.GrabFocus);
+	}
+
+	/// <summary>Plays the line's recording if one has been made (tools/elevenlabs_voice.py).</summary>
+	private void PlayVoice(string path)
+	{
+		StopVoice();
+		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
+			return;
+		using (var stream = GD.Load<AudioStream>(path))
+			_voice.Stream = stream;
+		_voice.Play();
+		Game.Instance.Music.Duck(true);
+	}
+
+	public override void _ExitTree() => ReleaseAudio();
+
+	/// <summary>Stops the voice and lets go of its stream (before quitting).</summary>
+	public void ReleaseAudio()
+	{
+		_voice?.Stop();
+		if (_voice != null)
+			_voice.Stream = null;
+	}
+
+	private void StopVoice()
+	{
+		if (_voice.Playing)
+		{
+			_voice.Stop();
+			Game.Instance.Music.Duck(false);
+		}
 	}
 
 	private void ClearChoices()

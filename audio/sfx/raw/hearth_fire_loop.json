@@ -1,0 +1,7 @@
+{
+  "text": "A small hearth fire indoors, close by: logs crackling softly with occasional gentle pops and hiss, calm and steady, no music.",
+  "loop": true,
+  "prompt_influence": 0.5,
+  "model_id": "eleven_text_to_sound_v3",
+  "duration_seconds": 15.0
+}

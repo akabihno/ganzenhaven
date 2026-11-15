@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Generate an image with Meshy's Text to Image API.
+"""Generate an image with Meshy's Text to Image API, or edit one with Image to Image.
 
 Usage:
     python3 tools/meshy_text_to_image.py <out.png> --prompt "..." [--model nano-banana-2]
-        [--aspect 16:9] [--transparent]
+        [--aspect 16:9] [--transparent] [--reference in.png ...]
+
+With --reference (up to 5 images) the prompt describes how to change them, which keeps a
+character recognisably the same across poses and expressions.
 
 Reads MESHY_API_KEY from the environment or the project's .env. Writes <out.png> and
 <out>.json (task id, prompt, credits). Re-running resumes the saved task.
 """
-import argparse, json, os, pathlib, sys, time, urllib.request, urllib.error
+import argparse, base64, json, os, pathlib, sys, time, urllib.request, urllib.error
 
 API = "https://api.meshy.ai/openapi/v1/text-to-image"
+EDIT_API = "https://api.meshy.ai/openapi/v1/image-to-image"
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 
@@ -44,6 +48,7 @@ def main():
     p.add_argument("--model", default="nano-banana-2")
     p.add_argument("--aspect", default="16:9")
     p.add_argument("--transparent", action="store_true")
+    p.add_argument("--reference", nargs="+", help="image(s) to edit -> Image to Image")
     a = p.parse_args()
 
     out = pathlib.Path(a.out)
@@ -51,16 +56,23 @@ def main():
     meta_file = out.with_suffix(".json")
     meta = json.loads(meta_file.read_text()) if meta_file.exists() else {}
 
+    api = EDIT_API if a.reference or meta.get("references") else API
     if "task_id" not in meta:
         body = {"ai_model": a.model, "prompt": a.prompt, "aspect_ratio": a.aspect}
         if a.transparent:
             body["remove_background"] = True
-        meta = {"task_id": call("POST", API, body)["result"], "prompt": a.prompt,
+        if a.reference:
+            body["reference_image_urls"] = [
+                "data:image/png;base64," + base64.b64encode(pathlib.Path(r).read_bytes()).decode()
+                for r in a.reference]
+        meta = {"task_id": call("POST", api, body)["result"], "prompt": a.prompt,
                 "model": a.model, "aspect": a.aspect}
+        if a.reference:
+            meta["references"] = a.reference
         meta_file.write_text(json.dumps(meta, indent=2))
 
     while True:
-        t = call("GET", f"{API}/{meta['task_id']}")
+        t = call("GET", f"{api}/{meta['task_id']}")
         if t["status"] == "SUCCEEDED":
             break
         if t["status"] in ("FAILED", "CANCELED"):

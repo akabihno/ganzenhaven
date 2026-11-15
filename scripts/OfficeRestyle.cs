@@ -4,8 +4,9 @@ using System.Collections.Generic;
 /// <summary>
 /// Turns the blocky Blender office into the dark medieval harbourmaster's office of
 /// assets/concepts/office_interior_b2.png: stone-and-plaster walls, soot-blackened timber,
-/// worn oak boards, an unglazed twin-arched window with open oak shutters, a smouldering
+/// worn oak boards, a twin-arched window with open oak shutters, a smouldering
 /// hearth, and Meshy props in place of the old primitive furniture.
+/// The arches are glazed with small leaded panes; the seagull smashes through the right one.
 /// </summary>
 /// <remarks>
 /// <para>Applied at load time rather than baked into the office glTF, so the Blender
@@ -24,6 +25,12 @@ public partial class OfficeRestyle : Node3D
 	/// <summary>Shutter on the right-hand arch, the one the seagull comes through.</summary>
 	public Node3D RightShutter { get; private set; }
 
+	/// <summary>Leaded glass in the right-hand arch; <see cref="ShatterGlass"/> breaks it.</summary>
+	public Node3D RightArchGlass { get; private set; }
+
+	/// <summary>Where the fire burns, for its sound.</summary>
+	public Vector3 FirePosition { get; private set; }
+
 	/// <summary>Where a bird flying through the right-hand arch crosses the wall.</summary>
 	public static readonly Vector3 RightArchCentre = new(ArchCentreX, 1.7f, -5.1f);
 
@@ -34,6 +41,8 @@ public partial class OfficeRestyle : Node3D
 	private const float SillY = 0.98f;
 
 	private OmniLight3D _fireLight, _candleLight;
+	private Node3D _shards;
+	private StandardMaterial3D _shardMaterial;
 	private readonly List<StandardMaterial3D> _embers = new();
 	private double _clock;
 
@@ -199,6 +208,106 @@ public partial class OfficeRestyle : Node3D
 		// back into the room.
 		BuildShutter(-0.9f, +1f, -100f);
 		RightShutter = BuildShutter(0.9f, -1f, 100f);
+		BuildGlass();
+	}
+
+	// ---------------------------------------------------------------- glass
+
+	private const float GlassZ = WallFace - 0.2f;
+	private static float GlassHeight => ArchSpring - SillY + ArchRadius;
+
+	/// <summary>Small leaded panes filling both arches, set back in the reveal.</summary>
+	private void BuildGlass()
+	{
+		var material = new ShaderMaterial { Shader = GD.Load<Shader>("res://shaders/leaded_glass.gdshader") };
+		material.SetShaderParameter("width", ArchRadius * 2f);
+		material.SetShaderParameter("height", GlassHeight);
+		material.SetShaderParameter("spring", ArchSpring - SillY);
+		material.SetShaderParameter("radius", ArchRadius);
+		MeshInstance3D Pane(string name, float x)
+		{
+			var pane = new MeshInstance3D
+			{
+				Name = name,
+				Mesh = new QuadMesh { Size = new Vector2(ArchRadius * 2f, GlassHeight) },
+				MaterialOverride = material,
+				CastShadow = GeometryInstance3D.ShadowCastingSetting.Off,
+				Position = new Vector3(x, SillY + GlassHeight / 2f, GlassZ),
+			};
+			AddChild(pane);
+			return pane;
+		}
+		Pane("LeftArchGlass", -ArchCentreX);
+		RightArchGlass = Pane("RightArchGlass", ArchCentreX);
+	}
+
+	/// <summary>
+	/// Breaks the glass in the right-hand arch: the pane goes and its pieces fly as real
+	/// physics bodies, most of them into the room (the way the bird was going), landing and
+	/// settling on the floorboards. Deterministic for a given seed.
+	/// </summary>
+	public void ShatterGlass(Vector3 push, int seed = 11)
+	{
+		ResetGlass();
+		RightArchGlass.Visible = false;
+
+		_shards = new Node3D { Name = "GlassShards" };
+		AddChild(_shards);
+
+		// Something for the pieces to land on.
+		var floor = new StaticBody3D { Name = "Floor" };
+		floor.AddChild(new CollisionShape3D { Shape = new WorldBoundaryShape3D { Plane = new Plane(Vector3.Up, 0f) } });
+		_shards.AddChild(floor);
+
+		_shardMaterial ??= new StandardMaterial3D
+		{
+			AlbedoColor = new Color(0.42f, 0.52f, 0.47f, 0.3f),
+			Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+			Roughness = 0.05f,
+			MetallicSpecular = 0.6f,
+			CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+		};
+		var bounce = new PhysicsMaterial { Bounce = 0.2f, Friction = 0.7f };
+		var rng = new RandomNumberGenerator { Seed = (ulong)seed };
+
+		for (int i = 0; i < 60; i++)
+		{
+			// A random spot inside the arch shape.
+			Vector2 p;
+			do
+				p = new Vector2(rng.RandfRange(-ArchRadius, ArchRadius), rng.RandfRange(0f, GlassHeight));
+			while (p.Y > ArchSpring - SillY && new Vector2(p.X, p.Y - (ArchSpring - SillY)).Length() > ArchRadius);
+
+			var size = new Vector3(rng.RandfRange(0.02f, 0.07f), rng.RandfRange(0.02f, 0.06f), 0.004f);
+			var shard = new RigidBody3D
+			{
+				Mass = 0.02f,
+				PhysicsMaterialOverride = bounce,
+				ContinuousCd = true,
+				Position = new Vector3(ArchCentreX + p.X, SillY + p.Y, GlassZ),
+				Rotation = new Vector3(rng.RandfRange(-0.4f, 0.4f), rng.RandfRange(-0.4f, 0.4f), rng.RandfRange(0f, Mathf.Tau)),
+			};
+			shard.AddChild(new CollisionShape3D { Shape = new BoxShape3D { Size = size + new Vector3(0, 0, 0.006f) } });
+			shard.AddChild(new MeshInstance3D { Mesh = new BoxMesh { Size = size }, MaterialOverride = _shardMaterial });
+
+			// Most pieces carry on with the bird; a few spray back out over the harbour.
+			bool outward = rng.Randf() < 0.18f;
+			Vector3 v = outward
+				? new Vector3(rng.RandfRange(-0.8f, 0.8f), rng.RandfRange(-0.3f, 0.8f), -rng.RandfRange(0.4f, 1.4f))
+				: push * rng.RandfRange(0.35f, 1.0f) + new Vector3(rng.RandfRange(-1.1f, 1.1f), rng.RandfRange(-0.6f, 1.4f), rng.RandfRange(0f, 0.8f));
+			shard.LinearVelocity = v;
+			shard.AngularVelocity = new Vector3(rng.RandfRange(-25f, 25f), rng.RandfRange(-25f, 25f), rng.RandfRange(-25f, 25f));
+			_shards.AddChild(shard);
+		}
+	}
+
+	/// <summary>Puts the pane back and clears the pieces (when the shot restarts).</summary>
+	public void ResetGlass()
+	{
+		_shards?.QueueFree();
+		_shards = null;
+		if (RightArchGlass != null)
+			RightArchGlass.Visible = true;
 	}
 
 	/// <summary>A plank shutter; <paramref name="dir"/> is which way it spans from its hinge.</summary>
@@ -317,6 +426,7 @@ public partial class OfficeRestyle : Node3D
 
 		// The firebox sits low and roughly central in the Meshy hearth.
 		var fireBase = hearth.Position + new Vector3(0f, 0.14f, -0.1f);
+		FirePosition = fireBase;
 
 		_fireLight = new OmniLight3D
 		{

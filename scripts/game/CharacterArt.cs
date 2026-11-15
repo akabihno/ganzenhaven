@@ -22,6 +22,33 @@ public static class CharacterArt
 		return null;
 	}
 
+	/// <summary>
+	/// The character a speaker name refers to: matched against the display names in
+	/// translations/ui.csv (char_&lt;id&gt;) in the current language, or the id itself.
+	/// Empty when nobody matches.
+	/// </summary>
+	public static string FindIdBySpeaker(string speaker)
+	{
+		if (string.IsNullOrWhiteSpace(speaker))
+			return "";
+		string wanted = speaker.Trim();
+		foreach (var file in ResourceLoader.ListDirectory("res://assets/art/characters"))
+		{
+			if (!file.EndsWith(".png"))
+				continue;
+			string id = file[..^4];
+			string key = $"char_{id}";
+			string name = TranslationServer.Translate(key);
+			// Expression sprites (seagull_tilt) have no display name of their own.
+			if (name == key)
+				continue;
+			if (string.Equals(name, wanted, System.StringComparison.OrdinalIgnoreCase)
+				|| string.Equals(id, wanted.Replace(' ', '_'), System.StringComparison.OrdinalIgnoreCase))
+				return id;
+		}
+		return "";
+	}
+
 	/// <summary>Where a dialogue sprite's feet go, as a share of the screen height. People
 	/// stand behind the text box like in a visual novel; small creatures stand on top of it.</summary>
 	public static float DialogueBaseline(string id) => id switch

@@ -13,7 +13,8 @@ using System.Text.RegularExpressions;
 public sealed class DialogueScript
 {
 	public abstract record Stmt(int Line);
-	public sealed record Say(int Line, string Speaker, string Text) : Stmt(Line);
+	/// <summary><paramref name="Expression"/>: from "Name [expression]: text", for this line only.</summary>
+	public sealed record Say(int Line, string Speaker, string Text, string Expression = "") : Stmt(Line);
 	public sealed record Command(int Line, string Name, string[] Args, string Rest) : Stmt(Line);
 	public sealed record Option(string Text, string Condition, List<Stmt> Body);
 	public sealed record Choice(int Line, List<Option> Options) : Stmt(Line);
@@ -22,6 +23,9 @@ public sealed class DialogueScript
 
 	public string Id { get; }
 	public string Path { get; }
+
+	/// <summary>Language of the file actually loaded ("ru", or "en" when it fell back).</summary>
+	public string Language { get; }
 	public List<Stmt> Body { get; }
 	public Dictionary<string, int> Labels { get; } = new();
 
@@ -29,6 +33,9 @@ public sealed class DialogueScript
 	{
 		Id = id;
 		Path = path;
+		// res://dialogs/<lang>/<id>.txt
+		var parts = path.Split('/');
+		Language = parts.Length > 3 ? parts[3] : "en";
 		Body = body;
 		for (int i = 0; i < body.Count; i++)
 			if (body[i] is Command { Name: "label" } label && label.Args.Length > 0)
@@ -69,9 +76,9 @@ public sealed class DialogueScript
 
 	private readonly record struct SourceLine(int Number, int Indent, string Text);
 
-	// "Name: text". The name may not hold sentence punctuation, so "Note: ..." style narration
-	// can still be forced with a leading backslash.
-	private static readonly Regex SpeakerLine = new(@"^(?<name>[^\s:@$*\\#][^:.!?""«»]{0,40}?):\s+(?<text>.+)$");
+	// "Name: text" or "Name [expression]: text". The name may not hold sentence punctuation, so
+	// "Note: ..." style narration can still be forced with a leading backslash.
+	private static readonly Regex SpeakerLine = new(@"^(?<name>[^\s:@$*\\#\[][^:.!?""«»\[]{0,40}?)(\s*\[(?<expr>[\w-]+)\])?:\s+(?<text>.+)$");
 
 	public static DialogueScript Parse(string id, string path, string source)
 	{
@@ -177,7 +184,7 @@ public sealed class DialogueScript
 			{
 				var m = SpeakerLine.Match(text);
 				block.Add(m.Success
-					? new Say(line.Number, m.Groups["name"].Value.Trim(), m.Groups["text"].Value.Trim())
+					? new Say(line.Number, m.Groups["name"].Value.Trim(), m.Groups["text"].Value.Trim(), m.Groups["expr"].Value)
 					: new Say(line.Number, "", text));
 			}
 		}

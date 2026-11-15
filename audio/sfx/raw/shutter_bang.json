@@ -1,0 +1,7 @@
+{
+  "text": "An old heavy wooden window shutter banging against a stone wall, iron hinges rattling.",
+  "loop": false,
+  "prompt_influence": 0.5,
+  "model_id": "eleven_text_to_sound_v3",
+  "duration_seconds": 1.5
+}

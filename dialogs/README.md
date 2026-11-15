@@ -23,7 +23,10 @@ The fog thickens.                                          narration (shown in i
 # comment                                                  ignored
 ```
 
-A speaker line is `Name: text`. The name is whatever you write; it is shown as is, so the
+A speaker line is `Name: text`. `Name [expression]: text` changes that character's sprite for
+this one line (`Seagull [tilt]: Do you have fish?`); the next line without a tag goes back to
+the sprite set by `@show`. The name is matched against the character names in
+`translations/ui.csv`, so `Чайка [tilt]:` works in the Russian file. The name is whatever you write; it is shown as is, so the
 Russian file writes `Рыбак:`. `_word_` is shown in italics; BBCode works too: `[i]…[/i]`,
 `[b]…[/b]`, `[color=red]…[/color]`.
 `{name}` inserts the value of a variable.
@@ -86,6 +89,8 @@ switch with their ShowIf / HideIf fields (e.g. the Tavern Keeper: `HideIf = tave
 @hide fisherman      @hide all
 @bg tavern           background from assets/art/backgrounds/
 @wait 1.5
+@music tavern        switch the background track (audio/music/<id>.ogg); @music stop
+                     (until the next screen change: every location plays its own track)
 @cutscene funeral    play a 3D cutscene, then continue this conversation
 @travel graveyard    end the conversation and go to a location
 @map                 end the conversation and open the map
@@ -96,7 +101,25 @@ switch with their ShowIf / HideIf fields (e.g. the Tavern Keeper: `HideIf = tave
 ```
 
 Sprites are `assets/art/characters/<id>.png`; an expression is `<id>_<expression>.png`
-(falls back to the plain sprite until it exists).
+(falls back to the plain sprite until it exists). An expression sprite should be cropped to the
+same size as the plain one, so swapping doesn't make the character jump.
+
+Expressions so far: `seagull tilt` (head cocked, asking).
+
+## Voice
+
+Lines are voiced with ElevenLabs by `tools/elevenlabs_voice.py`:
+
+```
+python3 tools/elevenlabs_voice.py office/seagull                 both languages
+python3 tools/elevenlabs_voice.py office/seagull --lang ru --force
+```
+
+Who speaks with which voice is in `tools/voices.json` (the seagull is Lily), including a
+delivery direction per character and per expression (`Seagull [tilt]:` lines sound curious).
+Each recording is named after its line's text, so after you edit a line it simply stops
+playing until you run the tool again; recordings of deleted lines are removed. Player
+choices, placeholder lines and lines with `{variables}` are not voiced. `_word_` is stressed.
 
 ## Testing (editor / debug builds)
 

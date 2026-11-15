@@ -11,6 +11,8 @@ journal_title,Journal,Журнал
 journal_empty,Nothing written yet.,Пока ничего не записано.
 journal_new,New in the journal,Новое в журнале
 journal_done,Done,Сделано
+journal_done_heading,Done,Сделано
+journal_close_hint,Click anywhere to close,"Щёлкните, чтобы закрыть"
 map_title,Ganzenhaven,Ганзенхавен
 loc_office,Harbourmaster's Office,Контора начальника порта
 loc_harbor,Harbour,Гавань

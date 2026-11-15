@@ -29,3 +29,6 @@ assets/models/**/*.fbx.import
 
 # Godot generates these from translations/ui.csv on import
 translations/*.translation
+
+# Generation logs from tools/elevenlabs_*.py
+audio/**/*.log

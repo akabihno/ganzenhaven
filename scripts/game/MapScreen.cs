@@ -15,6 +15,7 @@ public partial class MapScreen : Control
 		SetAnchorsPreset(LayoutPreset.FullRect);
 		if (Engine.IsEditorHint())
 			return;
+		Game.Instance.Music.Play("map");
 
 		var title = new Label { Text = Tr("map_title"), HorizontalAlignment = HorizontalAlignment.Center };
 		title.SetAnchorsPreset(LayoutPreset.CenterTop);

@@ -10,7 +10,8 @@ using static DialogueScript;
 public sealed class DialogueRunner
 {
 	public abstract record Event;
-	public sealed record SayEvent(string Speaker, string Text) : Event;
+	/// <summary><paramref name="VoicePath"/>: where this line's recording lives if it has been voiced.</summary>
+	public sealed record SayEvent(string Speaker, string Text, string Expression = "", string VoicePath = "") : Event;
 	public sealed record ChoiceEvent(IReadOnlyList<string> Options) : Event;
 	/// <summary>A command for the stage or the game: bg, show, hide, wait, cutscene, travel, map, music, sound.</summary>
 	public sealed record CommandEvent(string Name, string[] Args, string Rest, int Line, string Path) : Event;
@@ -74,7 +75,8 @@ public sealed class DialogueRunner
 			switch (stmt)
 			{
 				case Say say:
-					return new SayEvent(Interpolate(say.Speaker), Interpolate(say.Text));
+					return new SayEvent(Interpolate(say.Speaker), Interpolate(say.Text), say.Expression,
+						$"res://audio/voice/{frame.Script.Language}/{frame.Script.Id}/{VoiceKey(say.Speaker, say.Text)}.mp3");
 
 				case Choice choice:
 				{
@@ -193,6 +195,16 @@ public sealed class DialogueRunner
 
 	private static void Warn(Command cmd, Frame frame, string message) =>
 		GD.PushWarning($"{frame.Script.Path}:{cmd.Line}: {message}");
+
+	/// <summary>
+	/// Names a line's recording: the first 12 hex digits of sha1("speaker|text") over the line
+	/// as written in the script. tools/elevenlabs_voice.py computes the same.
+	/// </summary>
+	public static string VoiceKey(string speaker, string text)
+	{
+		byte[] hash = System.Security.Cryptography.SHA1.HashData(System.Text.Encoding.UTF8.GetBytes($"{speaker}|{text}"));
+		return System.Convert.ToHexString(hash).ToLowerInvariant()[..12];
+	}
 
 	private static readonly Regex VarRef = new(@"\{(?<name>[A-Za-z_][A-Za-z0-9_]*)\}");
 

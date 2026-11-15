@@ -10,6 +10,7 @@ public partial class MainMenu : Control
 	{
 		SetAnchorsPreset(LayoutPreset.FullRect);
 		Build();
+		Game.Instance.Music.Play("map");
 		GameState.Instance.LanguageChanged += OnLanguageChanged;
 	}
 
@@ -53,7 +54,7 @@ public partial class MainMenu : Control
 		}
 		_buttons.AddChild(langs);
 
-		Add(Tr("menu_quit"), () => GetTree().Quit());
+		Add(Tr("menu_quit"), () => Game.Instance.Quit());
 		((Control)_buttons.GetChild(0)).CallDeferred(Control.MethodName.GrabFocus);
 	}
 
