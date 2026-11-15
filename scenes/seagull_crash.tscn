@@ -1,0 +1,95 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/SeagullCrash.cs" id="1_crash"]
+[ext_resource type="Script" path="res://scripts/FoggyHarbourShips.cs" id="2_ships"]
+[ext_resource type="PackedScene" path="res://assets/models/office_interior/office_interior.gltf" id="3_office"]
+[ext_resource type="PackedScene" path="res://assets/models/seagull_advisor/model.glb" id="4_gull"]
+[ext_resource type="Script" path="res://scripts/OfficeRestyle.cs" id="5_restyle"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_fog"]
+sky_top_color = Color(0.74, 0.79, 0.84, 1)
+sky_horizon_color = Color(0.89, 0.91, 0.93, 1)
+ground_bottom_color = Color(0.62, 0.66, 0.68, 1)
+ground_horizon_color = Color(0.89, 0.91, 0.93, 1)
+sun_angle_max = 40.0
+
+[sub_resource type="Sky" id="Sky_fog"]
+sky_material = SubResource("ProceduralSkyMaterial_fog")
+
+[sub_resource type="Environment" id="Environment_fog"]
+background_mode = 2
+sky = SubResource("Sky_fog")
+ambient_light_source = 3
+ambient_light_energy = 0.12
+reflected_light_source = 2
+tonemap_mode = 4
+tonemap_exposure = 1.0
+ssao_enabled = true
+ssao_intensity = 2.5
+ssil_enabled = true
+ssil_intensity = 1.2
+glow_enabled = true
+glow_intensity = 0.5
+glow_bloom = 0.06
+fog_enabled = true
+fog_mode = 1
+fog_light_color = Color(0.85, 0.88, 0.91, 1)
+fog_light_energy = 1.25
+fog_sun_scatter = 0.2
+fog_density = 0.96
+fog_sky_affect = 0.85
+fog_depth_curve = 1.0
+fog_depth_begin = 7.0
+fog_depth_end = 62.0
+volumetric_fog_enabled = true
+volumetric_fog_density = 0.02
+volumetric_fog_albedo = Color(0.85, 0.87, 0.9, 1)
+volumetric_fog_anisotropy = 0.6
+volumetric_fog_length = 48.0
+volumetric_fog_sky_affect = 0.0
+
+[node name="SeagullCrash" type="Node3D"]
+script = ExtResource("1_crash")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_fog")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+rotation = Vector3(-0.5, 2.9, 0)
+light_color = Color(1, 0.97, 0.92, 1)
+light_energy = 2.2
+light_volumetric_fog_energy = 2.5
+shadow_enabled = true
+shadow_blur = 1.5
+directional_shadow_max_distance = 40.0
+
+[node name="WindowDaylight" type="SpotLight3D" parent="."]
+transform = Transform3D(-1, 0, 0, 0, 0.94, 0.342, 0, 0.342, -0.94, 0.3, 1.75, -4.75)
+light_color = Color(0.86, 0.9, 1, 1)
+light_energy = 3.0
+light_volumetric_fog_energy = 0.5
+shadow_enabled = true
+spot_range = 8.0
+spot_attenuation = 1.3
+spot_angle = 65.0
+spot_angle_attenuation = 1.6
+
+[node name="Office" parent="." instance=ExtResource("3_office")]
+
+[node name="OfficeRestyle" type="Node3D" parent="."]
+script = ExtResource("5_restyle")
+
+[node name="Harbour" type="Node3D" parent="."]
+script = ExtResource("2_ships")
+
+[node name="Seagull" type="Node3D" parent="."]
+position = Vector3(0.3, 0.25, -1.7)
+
+[node name="Model" parent="Seagull" instance=ExtResource("4_gull")]
+
+[node name="PlayerCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.62, -0.3)
+current = true
+fov = 52.0
+near = 0.05
+far = 200.0

@@ -1,0 +1,7 @@
+{
+  "task_id": "01a1d6f0-89c4-7400-94fd-8060478da483",
+  "prompt": "Photorealistic interior of a medieval 14th-century harbourmaster's office in a Hanseatic port town, at eye level, seen from a corner of the room. A dim, dark room: heavy soot-blackened oak ceiling beams and planks, rough stone walls with patchy flaking lime plaster, worn wide oak floorboards. On the left wall a low stone hearth with dying embers glowing orange. A long oak trestle table with an open ledger, tally sticks, brass scales and a few coins, a tallow candle in an iron holder. Barrels and grain sacks by the wall, a faded painted heraldic shield, a ship model on a plank shelf. The only daylight comes from the window on the far wall to the right, the rest of the room falls into deep shadow, dust drifting in the beam. Outside: a bright foggy morning, pale grey fog with faint silhouettes of tall wooden ship masts, yards and rigging. Strictly period-accurate, no glass panes, no modern window frame, no sash, no metal handles. Moody low-key lighting, realistic aged materials, cinematic 35mm photograph, no people. The window: a small, deep-set unglazed opening in the thick stone wall with a rounded stone arch and a single central stone mullion, two heavy weathered oak shutters with iron strap hinges swung open inward against the deep stone reveal, a wide stone sill.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "consumed_credits": 6
+}

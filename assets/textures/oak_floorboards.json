@@ -1,0 +1,7 @@
+{
+  "task_id": "01a1d6f4-5326-77dc-9a19-99b7a17cb479",
+  "prompt": "Seamless tileable texture, perfectly flat orthographic straight-on view, even flat diffuse lighting with no shadows, no perspective, no vignette, high detail PBR albedo map. Top-down view of worn wide dark oak floorboards running vertically, medieval, scuffed, aged grey-brown, thin dark gaps between boards, iron nail heads.",
+  "model": "nano-banana-2",
+  "aspect": "1:1",
+  "consumed_credits": 6
+}

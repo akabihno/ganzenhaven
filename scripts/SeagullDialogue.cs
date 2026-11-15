@@ -13,7 +13,7 @@ using Godot;
 [GlobalClass]
 public partial class SeagullDialogue : Sprite2D
 {
-	private const string SeagullTexturePath = "res://assets/seagull_broken_wing.png";
+	private const string SeagullTexturePath = "res://assets/seagull_broken_wing_lifelike.png";
 
 	private static readonly (string Speaker, string Text)[] Lines =
 	{
