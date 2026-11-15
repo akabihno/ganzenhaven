@@ -3,4 +3,6 @@
 @if tavern_keeper_dead
   Seagull: [placeholder — after the Tavern Keeper's death]
 @else
-  Seagull: [placeholder — before]
+  Seagull: Here it is again, the same pitying head tilt
+  * Wanna grab a bite?
+  Seagull: Like always, for you, people, food is the first and only solution.
