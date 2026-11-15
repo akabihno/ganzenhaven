@@ -1,0 +1,20 @@
+{
+  "26bcd2abf09e": {
+    "speaker": "Black Cat",
+    "expression": "",
+    "text": "I knew it.",
+    "sent": "[low, knowing, unhurried] I knew it."
+  },
+  "4c59e45f1459": {
+    "speaker": "Black Cat",
+    "expression": "",
+    "text": "Meow",
+    "sent": "[low, knowing, unhurried] Meow"
+  },
+  "4ef7afec3bf3": {
+    "speaker": "Black Cat",
+    "expression": "",
+    "text": "...",
+    "sent": "[low, knowing, unhurried] [slow, unimpressed] Mrrr."
+  }
+}

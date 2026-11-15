@@ -1,0 +1,20 @@
+{
+  "85c1c89790e3": {
+    "speaker": "Чёрный кот",
+    "expression": "",
+    "text": "Я так и знал.",
+    "sent": "[low, knowing, unhurried] Я так и знал."
+  },
+  "251b81e3e63b": {
+    "speaker": "Чёрный кот",
+    "expression": "",
+    "text": "Мяу.",
+    "sent": "[low, knowing, unhurried] Мяу."
+  },
+  "4c9bdd21360a": {
+    "speaker": "Чёрный кот",
+    "expression": "",
+    "text": "...",
+    "sent": "[low, knowing, unhurried] [slow, unimpressed] Mrrr."
+  }
+}

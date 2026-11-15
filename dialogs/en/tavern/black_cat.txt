@@ -1,6 +1,7 @@
-# PLACEHOLDER — replace with your dialogue.
 @show black_cat
 @if tavern_keeper_dead
-  Black Cat: [placeholder — after the Tavern Keeper's death]
+  Black Cat: I knew it.
 @else
-  Black Cat: [placeholder — before]
+  Black Cat: Meow
+  * Kitty-kitty
+    Black Cat: ...
