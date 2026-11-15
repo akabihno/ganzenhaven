@@ -1,0 +1,10 @@
+# ЗАГЛУШКА — замените своим текстом.
+# Первый визит после смерти трактирщика показывает похоронную процессию.
+@if tavern_keeper_dead and !funeral_seen
+  @cutscene funeral
+  $set funeral_seen
+@show gravedigger
+@if tavern_keeper_dead
+  Могильщик: [заглушка — после смерти трактирщика]
+@else
+  Могильщик: [заглушка — до]

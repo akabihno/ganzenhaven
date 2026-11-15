@@ -1,0 +1,12 @@
+# Runs once, the first time the player arrives at the office
+# (scenes/game/locations/office.tscn: EnterScript = "intro", EnterScriptIf = "!intro_done").
+@cutscene seagull_arrival
+@show seagull center
+A herring gull is hunched by the office door. Its right wing hangs at an angle that wings are not built to reach.
+Seagull: ...
+Seagull: Don't. Don't do the head-tilt thing. I have had quite enough sympathy for one morning.
+It shifts its weight, and the wing drags across the boards.
+Seagull: Trawler winch. I was faster than it, right up until the moment I wasn't.
+Seagull: So you're the new harbourmaster. Congratulations. Your first problem is standing directly in front of you.
+$set intro_done
+$set map_unlocked

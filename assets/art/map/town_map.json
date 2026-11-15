@@ -1,0 +1,7 @@
+{
+  "task_id": "01a1dec9-7108-763a-a2c8-00be5c52071e",
+  "prompt": "Hand-drawn illustrated medieval map of a small harbour town seen from above, ink and watercolour on aged parchment. The harbour with a wooden quay and moored ships at the bottom, a small stone harbourmaster's office by the quay, a tavern with a hanging sign in the town, a church with a fenced graveyard on the left, a single huge oak tree on a hill at the top, a patch of dense bushes near the dunes on the right, dirt roads connecting them, a compass rose, a small sea serpent in the water. No text, no letters, no labels.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "consumed_credits": 6
+}

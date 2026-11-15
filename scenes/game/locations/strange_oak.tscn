@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
+[ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
+[ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+
+[node name="StrangeOak" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loc")
+LocationId = "strange_oak"
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Ribbons" type="Control" parent="."]
+offset_left = 300
+offset_top = 440
+offset_right = 860
+offset_bottom = 600
+script = ExtResource("3_hot")
+LabelKey = "hs_ribbons"
+Dialogue = "strange_oak/ribbons"
+
+[node name="Hollow" type="Control" parent="."]
+offset_left = 570
+offset_top = 600
+offset_right = 710
+offset_bottom = 745
+script = ExtResource("3_hot")
+LabelKey = "hs_hollow"
+Dialogue = "strange_oak/hollow"
+
+[node name="Stones" type="Control" parent="."]
+offset_left = 220
+offset_top = 750
+offset_right = 1020
+offset_bottom = 850
+script = ExtResource("3_hot")
+LabelKey = "hs_stones"
+Dialogue = "strange_oak/stones"
+
+[node name="BlackCat" type="Control" parent="."]
+offset_left = 996
+offset_top = 690
+offset_right = 1124
+offset_bottom = 890
+script = ExtResource("2_spot")
+CharacterId = "black_cat"
+Dialogue = "strange_oak/black_cat"
+Height = 200.0
+ShowIf = "tavern_keeper_dead"

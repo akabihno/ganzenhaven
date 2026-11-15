@@ -8,21 +8,21 @@
 [node name="seagull" type="Node" unique_id=443424798]
 
 [node name="Seagull" type="Sprite2D" parent="." unique_id=1954808309]
-position = Vector2(930, 528)
+position = Vector2(1550, 880)
 self_modulate = Color(0.82, 0.8, 0.78, 1)
-scale = Vector2(0.18, 0.18)
+scale = Vector2(0.3, 0.3)
 script = ExtResource("1_htak3")
 DrawBackdrop = false
 
 [node name="Background" type="Sprite2D" parent="." unique_id=662684529]
 z_index = -10
-position = Vector2(576, 324)
-scale = Vector2(0.844, 0.844)
+position = Vector2(960, 540)
+scale = Vector2(1.407, 1.407)
 texture = ExtResource("2_or5sd")
 script = ExtResource("3_su3vp")
 TexturePath = "res://assets/harbourmaster_office_medieval.png"
 
 [node name="NPCs" type="Node2D" parent="." unique_id=1383028730]
 script = ExtResource("4_su3vp")
-SpawnAreaMin = Vector2(240, 592)
-SpawnAreaMax = Vector2(830, 636)
+SpawnAreaMin = Vector2(400, 987)
+SpawnAreaMax = Vector2(1383, 1060)

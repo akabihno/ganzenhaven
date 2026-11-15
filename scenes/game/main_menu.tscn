@@ -1,0 +1,35 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/MainMenu.cs" id="1_menu"]
+[ext_resource type="Texture2D" path="res://assets/art/backgrounds/harbor.png" id="2_bg"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="Background" type="TextureRect" parent="."]
+modulate = Color(0.55, 0.55, 0.58, 1)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Title" type="Label" parent="."]
+offset_left = 150.0
+offset_top = 150.0
+offset_right = 1200.0
+offset_bottom = 330.0
+theme_override_colors/font_color = Color(0.96, 0.88, 0.7, 1)
+theme_override_font_sizes/font_size = 140
+text = "Ganzenhaven"

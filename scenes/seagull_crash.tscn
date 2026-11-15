@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" path="res://assets/models/office_interior/office_interior.gltf" id="3_office"]
 [ext_resource type="PackedScene" path="res://assets/models/seagull_advisor/model.glb" id="4_gull"]
 [ext_resource type="Script" path="res://scripts/OfficeRestyle.cs" id="5_restyle"]
+[ext_resource type="PackedScene" path="res://assets/models/seagull_flying/seagull_flying_rigged.glb" id="6_flyer"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_fog"]
 sky_top_color = Color(0.74, 0.79, 0.84, 1)
@@ -86,6 +87,8 @@ script = ExtResource("2_ships")
 position = Vector3(0.3, 0.25, -1.7)
 
 [node name="Model" parent="Seagull" instance=ExtResource("4_gull")]
+
+[node name="FlyingModel" parent="Seagull" instance=ExtResource("6_flyer")]
 
 [node name="PlayerCamera" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.62, -0.3)

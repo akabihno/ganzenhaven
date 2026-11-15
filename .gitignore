@@ -19,3 +19,9 @@ assets/**/*.log
 assets/models/**/model_*.png*
 assets/models/**/model_*.jpg*
 assets/models/**/*.fbx.import
+
+# IDE settings
+.idea/
+
+# Godot generates these from translations/ui.csv on import
+translations/*.translation

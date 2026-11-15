@@ -88,8 +88,8 @@ public partial class OfficeRestyle : Node3D
 		"Candle", "Flame_Desk", "CandleGlow_Desk", "ModelShip_", "RolledChart_",
 		"VisitorTable", "VisitorChair", "VisitorStool",
 		"Lantern_", "CandleGlow_Lantern",
-		// A flat painted board reads wrong on rough stone.
-		"Shield_",
+		// Flat painted boards read wrong on rough stone.
+		"Shield_", "WallMap", "MapRoll_",
 		// Panelling doesn't belong on rough stone.
 		"Wainscot_",
 	};

@@ -1,0 +1,73 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
+[ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
+[ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+
+[node name="Graveyard" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loc")
+LocationId = "graveyard"
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Sea" type="Control" parent="."]
+offset_left = 0
+offset_top = 470
+offset_right = 700
+offset_bottom = 600
+script = ExtResource("3_hot")
+LabelKey = "hs_sea"
+Dialogue = "graveyard/sea"
+
+[node name="Church" type="Control" parent="."]
+offset_left = 900
+offset_top = 260
+offset_right = 1480
+offset_bottom = 640
+script = ExtResource("3_hot")
+LabelKey = "hs_church"
+Dialogue = "graveyard/church"
+
+[node name="OldGrave" type="Control" parent="."]
+offset_left = 660
+offset_top = 700
+offset_right = 820
+offset_bottom = 840
+script = ExtResource("3_hot")
+LabelKey = "hs_old_grave"
+Dialogue = "graveyard/old_grave"
+
+[node name="Priest" type="Control" parent="."]
+offset_left = 948
+offset_top = 465
+offset_right = 1032
+offset_bottom = 705
+script = ExtResource("2_spot")
+CharacterId = "priest"
+Dialogue = "graveyard/priest"
+Height = 240.0
+
+[node name="Gravedigger" type="Control" parent="."]
+offset_left = 1593
+offset_top = 445
+offset_right = 1807
+offset_bottom = 1005
+script = ExtResource("2_spot")
+CharacterId = "gravedigger"
+Dialogue = "graveyard/gravedigger"
+Height = 560.0
