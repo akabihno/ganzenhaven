@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee0-a47f-7007-907d-8080ee75ec27",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: deep blue moonlit darkness, cold silvery moonlight, long soft shadows, a little fog. The town across the water shows a few warmly lit windows.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/bushes.png"
+  ],
+  "consumed_credits": 6
+}

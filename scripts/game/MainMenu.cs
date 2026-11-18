@@ -21,6 +21,9 @@ public partial class MainMenu : Control
 		_sfxPreview = new AudioStreamPlayer { Bus = "Sfx", Stream = GD.Load<AudioStream>("res://audio/sfx/gull_indignant.ogg") };
 		AddChild(_sfxPreview);
 		Build();
+		// The title screen shows the harbour as the saved game left it: by night after the death.
+		if (GetNodeOrNull<TextureRect>("Background") is { } background && SavedAfterTheDeath())
+			background.Texture = Night.NightOf(background.Texture);
 		Game.Instance.Music.Play("map");
 		GameState.Instance.LanguageChanged += OnLanguageChanged;
 	}
@@ -52,6 +55,16 @@ public partial class MainMenu : Control
 	}
 
 	private void OnLanguageChanged(string language) => Build();
+
+	private static bool SavedAfterTheDeath()
+	{
+		if (GameState.Instance.IsAfter)
+			return true;
+		if (!GameState.HasSave)
+			return false;
+		using var file = FileAccess.Open("user://save.json", FileAccess.ModeFlags.Read);
+		return file != null && file.GetAsText().Contains($"\"{GameState.TavernKeeperDead}\"");
+	}
 
 	private void Build()
 	{

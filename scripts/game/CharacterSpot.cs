@@ -56,6 +56,16 @@ public partial class CharacterSpot : Control
 		set { _flip = value; Rebuild(); }
 	}
 
+	/// <summary>A soft patch of shade on the ground under their feet, so they stand in the
+	/// picture rather than on it.</summary>
+	[Export]
+	public bool Shadow
+	{
+		get => _shadow;
+		set { _shadow = value; QueueRedraw(); }
+	}
+	private bool _shadow;
+
 	public bool Interactive { get; set; } = true;
 
 	private TextureRect _sprite;
@@ -99,20 +109,49 @@ public partial class CharacterSpot : Control
 		_sprite.Position = Vector2.Zero;
 		_sprite.Size = Size;
 		// In the scene the people sit back in the light of the location.
-		_sprite.SelfModulate = new Color(0.86f, 0.84f, 0.82f);
+		_sprite.SelfModulate = BaseTint;
+		QueueRedraw();
 	}
+
+	public override void _Draw()
+	{
+		if (!_shadow)
+			return;
+		// Layered ovals under the feet, darkest in the middle; drawn behind the sprite.
+		var centre = new Vector2(Size.X / 2f, Size.Y - _height * 0.025f);
+		var radius = new Vector2(Mathf.Max(Size.X * 0.62f, _height * 0.17f), _height * 0.05f);
+		for (int i = 10; i >= 1; i--)
+		{
+			float k = i / 10f;
+			var points = new Vector2[40];
+			for (int p = 0; p < points.Length; p++)
+			{
+				float a = Mathf.Tau * p / points.Length;
+				points[p] = centre + new Vector2(Mathf.Cos(a) * radius.X, Mathf.Sin(a) * radius.Y) * k;
+			}
+			DrawColoredPolygon(points, new Color(0f, 0f, 0.02f, 0.15f));
+		}
+	}
+
+	// Back in the location's light; at night, in moonlight (unless painted by night already).
+	private Color BaseTint => Engine.IsEditorHint() || !Night.IsNight ? new Color(0.86f, 0.84f, 0.82f)
+		: CharacterArt.IsNightLit(_characterId) ? new Color(0.8f, 0.82f, 0.88f) : Night.Figure;
+	private Color HoverTint => Engine.IsEditorHint() || !Night.IsNight ? new Color(1.08f, 1.06f, 1.0f)
+		: CharacterArt.IsNightLit(_characterId) ? new Color(1.05f, 1.05f, 1.08f) : Night.Figure * 1.45f;
 
 	public void Refresh()
 	{
 		var state = GameState.Instance;
 		Visible = state.Check(ShowIf) && (string.IsNullOrEmpty(HideIf) || !state.Check(HideIf));
+		if (!_hover && _sprite != null)
+			_sprite.SelfModulate = BaseTint;
 	}
 
 	private void SetHover(bool on)
 	{
 		_hover = on && Interactive && !string.IsNullOrEmpty(Dialogue);
 		var tween = CreateTween();
-		tween.TweenProperty(_sprite, "self_modulate", _hover ? new Color(1.08f, 1.06f, 1.0f) : new Color(0.86f, 0.84f, 0.82f), 0.15f);
+		tween.TweenProperty(_sprite, "self_modulate", _hover ? HoverTint : BaseTint, 0.15f);
 		MouseDefaultCursorShape = _hover ? CursorShape.PointingHand : CursorShape.Arrow;
 
 		if (_hover)

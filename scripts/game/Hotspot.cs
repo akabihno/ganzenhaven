@@ -71,7 +71,13 @@ public partial class Hotspot : Control
 	public override void _Draw()
 	{
 		if (_picture != null)
-			DrawTextureRect(_picture, new Rect2(Vector2.Zero, Size), false);
+		{
+			// At night: its night picture if it has one (cut from the night background), or moonlit.
+			bool night = !Engine.IsEditorHint() && Night.IsNight;
+			var texture = night ? Night.Variant(_picture, out bool own) : _picture;
+			bool tint = night && texture == _picture;
+			DrawTextureRect(texture, new Rect2(Vector2.Zero, Size), false, tint ? Night.Prop : Colors.White);
+		}
 		if (Engine.IsEditorHint())
 		{
 			// Placement guide, editor only.

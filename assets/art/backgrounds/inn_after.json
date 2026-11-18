@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee1-a790-7739-b964-17f29733a874",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: the room is dim, lit by the fireplace and the candles on the table and the wall; the doorway and windows show deep blue moonlit night outside.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/inn.png"
+  ],
+  "consumed_credits": 6
+}

@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee0-a4ab-7435-ae0e-4949cd78e9bd",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: deep blue moonlit darkness, cold silvery moonlight, long soft shadows, a little fog. A few lanterns glow warm on the quay and on the ships, warm candlelight in some windows of the houses.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/harbor.png"
+  ],
+  "consumed_credits": 6
+}

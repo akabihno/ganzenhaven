@@ -58,6 +58,8 @@ public partial class LocationScreen : Control, IStage
 		if (Engine.IsEditorHint())
 			return;
 
+		ApplyNight();
+
 		_sprites = new Control { Name = "DialogueSprites", MouseFilter = MouseFilterEnum.Ignore };
 		_sprites.SetAnchorsPreset(LayoutPreset.FullRect);
 		AddChild(_sprites);
@@ -91,6 +93,17 @@ public partial class LocationScreen : Control, IStage
 	private void RunEnterScript() => Game.Instance.RunDialogue(EnterScript);
 
 	private void OnLanguageChanged(string language) => Refresh();
+
+	/// <summary>
+	/// Picture layers in the scene other than the background (the tavern's counter front, the
+	/// oak's trunk) switch to their night versions after the Tavern Keeper's death.
+	/// </summary>
+	private void ApplyNight()
+	{
+		foreach (var node in FindChildren("*", "TextureRect", true, false))
+			if (node is TextureRect layer && layer != _background && layer.Texture != null)
+				layer.Texture = Night.Variant(Night.Day(layer.Texture), out _);
+	}
 
 	/// <summary>Re-applies ShowIf / HideIf on everything after the story state changed.</summary>
 	private void Refresh()
@@ -172,6 +185,7 @@ public partial class LocationScreen : Control, IStage
 			CreateTween().TweenProperty(sprite, "modulate:a", 1f, 0.25f);
 		}
 		sprite.Texture = texture;
+		sprite.SelfModulate = Night.IsNight && !CharacterArt.IsNightLit(id) ? Night.Speaker : Colors.White;
 		_shownExpression[id] = expression ?? "";
 
 		// Dialogue sprites stand large and up close.

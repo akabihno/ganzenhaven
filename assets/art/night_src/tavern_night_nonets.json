@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee2-5cb0-72ad-86a0-9fb4d7159b47",
+  "prompt": "Exactly the same photograph of the dark tavern at night, same framing, light and every object in the same place. The only change: the large fishing nets hanging on the back wall above the table are gone, showing the bare stained plaster and brick wall behind them. Keep the coiled ropes on either side, the lantern and everything else unchanged.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/night_src/tavern_night_withnets.png"
+  ],
+  "consumed_credits": 6
+}

@@ -1,10 +1,8 @@
 # PLACEHOLDER — replace with your dialogue.
-# The first visit after the Tavern Keeper's death plays the funeral procession.
-@if tavern_keeper_dead and !funeral_seen
+# The gravedigger is only here at night, after the Tavern Keeper's death.
+# The first visit plays the funeral procession.
+@if !funeral_seen
   @cutscene funeral
   $set funeral_seen
 @show gravedigger
-@if tavern_keeper_dead
-  Gravedigger: [placeholder — after the Tavern Keeper's death]
-@else
-  Gravedigger: [placeholder — before]
+Gravedigger: [placeholder]

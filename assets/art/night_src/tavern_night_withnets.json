@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee1-a7a0-715b-9f2e-b746c03f8a44",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: the tavern is dark and nearly empty, lit only by the hearth fire, the ship's lantern and a few candles on the counter; deep shadows in the corners.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/night_src/tavern_withnets.png"
+  ],
+  "consumed_credits": 6
+}

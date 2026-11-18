@@ -182,8 +182,36 @@ with the arrows. A hotspot can also have **Opens** `journal` or `inventory`.
 ## The two acts
 
 **`tavern_keeper_dead`** is the one flag the game itself knows: setting it starts the second
-half. Locations then use `<background>_after.png` when one exists, and characters/hotspots
-switch with their ShowIf / HideIf fields (e.g. the Tavern Keeper: `HideIf = tavern_keeper_dead`).
+half, and **night falls**. For now it is set by a placeholder option on the tavern's barrels
+(`tavern/barrels.txt`); move that block wherever the death really happens.
+
+At night:
+
+* every location has a night picture, `assets/art/backgrounds/<id>_after.png`; so do the
+  pieces cut from a background (the tavern's counter front and nets, the oak's trunk and
+  stones: `<name>_after.png` beside the day one), so they keep matching it;
+* people standing about are in cold moonlight, and someone speaking up close is a little
+  dimmed; things lying about without a night picture (the cloth, the scissors) too;
+* people who only come out at night (the priest and the gravedigger, `ShowIf =
+  tavern_keeper_dead`) are painted by night already, so they aren't tinted again — the list is
+  `CharacterArt.IsNightLit`; their day-lit originals are kept in `assets/art/night_src/`;
+* a character spot with **Shadow** ticked casts a soft patch of shade under the feet;
+* the map, journal, ledger and inventory are read by candlelight;
+* the title screen shows the harbour by night once the saved game is past the death.
+
+Characters and hotspots switch between the acts with their ShowIf / HideIf fields (e.g. the
+Tavern Keeper: `HideIf = tavern_keeper_dead`). F9 flips the act for testing.
+
+### The foxes at the Strange Oak
+
+At night fifteen small foxes, standing like people and holding hands, dance slowly round the oak inside
+the stone circle, tails swaying. They are 3D (`assets/models/fox/fox.glb`) drawn over the
+painting; the **FoxDance** node in `scenes/game/locations/strange_oak.tscn` has the settings:
+when they're there (`ShowIf`, `tavern_keeper_dead` by default), how many and how big
+(`Count`, `FoxScale`: smaller foxes need more of them to keep hands joined), the ring's radius,
+how fast it turns, and the step: `CrouchStep` (creeping, the default) or `SideStep` (upright).
+
+Fireflies drift about the oak there too, flashing (`FireflyCount`).
 
 ## Stage and flow
 

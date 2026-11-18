@@ -132,6 +132,8 @@ public partial class InventoryView : Control
 		GameState.Instance.InventoryUpdated += (_, _) => { if (Visible) Fill(); };
 		GameState.Instance.Changed += () => { if (Visible) UpdatePurse(); };
 
+		_candle = Night.Candlelight(new Vector2(0.45f, 0.42f));
+		AddChild(_candle);
 		FitFrame();
 	}
 
@@ -142,8 +144,11 @@ public partial class InventoryView : Control
 		_purse.Text = coins.Length == 0 ? Tr("purse_empty") : $"{Tr("purse")}: {coins}";
 	}
 
+	private ColorRect _candle;
+
 	public void Open()
 	{
+		_candle.Visible = Night.IsNight;
 		_selected = "";
 		Fill();
 		Show();

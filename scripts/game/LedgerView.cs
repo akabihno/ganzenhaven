@@ -77,11 +77,16 @@ public partial class LedgerView : Control
 				Close();
 		};
 		GameState.Instance.Changed += () => { if (Visible) Fill(); };
+		_candle = Night.Candlelight(new Vector2(0.5f, 0.5f));
+		AddChild(_candle);
 		FitFrame();
 	}
 
+	private ColorRect _candle;
+
 	public void Open()
 	{
+		_candle.Visible = Night.IsNight;
 		_spread = 0;
 		Fill();
 		Show();

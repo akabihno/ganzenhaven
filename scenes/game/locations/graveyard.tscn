@@ -53,14 +53,16 @@ LabelKey = "hs_old_grave"
 Dialogue = "graveyard/old_grave"
 
 [node name="Priest" type="Control" parent="."]
-offset_left = 948
-offset_top = 465
-offset_right = 1032
-offset_bottom = 705
+offset_left = 1083
+offset_top = 565
+offset_right = 1149
+offset_bottom = 765
 script = ExtResource("2_spot")
 CharacterId = "priest"
 Dialogue = "graveyard/priest"
-Height = 240.0
+ShowIf = "tavern_keeper_dead"
+Shadow = true
+Height = 200.0
 
 [node name="Gravedigger" type="Control" parent="."]
 offset_left = 1593
@@ -70,4 +72,6 @@ offset_bottom = 1005
 script = ExtResource("2_spot")
 CharacterId = "gravedigger"
 Dialogue = "graveyard/gravedigger"
+ShowIf = "tavern_keeper_dead"
+Shadow = true
 Height = 560.0

@@ -1,6 +1,0 @@
-# PLACEHOLDER — replace with your dialogue.
-@show black_cat
-@if tavern_keeper_dead
-  Black Cat: [placeholder — after the Tavern Keeper's death]
-@else
-  Black Cat: [placeholder — before]

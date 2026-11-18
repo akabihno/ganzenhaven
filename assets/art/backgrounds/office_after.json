@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee1-a7b4-738e-b9c5-0fcb0240ccd7",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: the room is dark, lit only by the low glow of the dying hearth fire and one candle on the table; cold blue moonlight falls through the leaded window.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/office.png"
+  ],
+  "consumed_credits": 6
+}

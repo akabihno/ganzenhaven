@@ -26,59 +26,59 @@ expand_mode = 1
 stretch_mode = 6
 
 [node name="Office" type="Control" parent="."]
-offset_left = 674
-offset_top = 714
-offset_right = 766
-offset_bottom = 806
+offset_left = 627
+offset_top = 667
+offset_right = 793
+offset_bottom = 833
 script = ExtResource("2_marker")
 LocationId = "office"
 
 [node name="Harbor" type="Control" parent="."]
-offset_left = 1074
-offset_top = 784
-offset_right = 1166
-offset_bottom = 876
+offset_left = 893
+offset_top = 733
+offset_right = 1240
+offset_bottom = 960
 script = ExtResource("2_marker")
 LocationId = "harbor"
 
 [node name="Tavern" type="Control" parent="."]
-offset_left = 914
-offset_top = 404
-offset_right = 1006
-offset_bottom = 496
+offset_left = 880
+offset_top = 390
+offset_right = 1040
+offset_bottom = 520
 script = ExtResource("2_marker")
 LocationId = "tavern"
 
 [node name="Graveyard" type="Control" parent="."]
-offset_left = 394
-offset_top = 354
-offset_right = 486
-offset_bottom = 446
+offset_left = 333
+offset_top = 260
+offset_right = 547
+offset_bottom = 473
 script = ExtResource("2_marker")
 LocationId = "graveyard"
 AttentionIf = "tavern_keeper_dead and !funeral_seen"
 
 [node name="StrangeOak" type="Control" parent="."]
-offset_left = 934
-offset_top = 129
-offset_right = 1026
-offset_bottom = 221
+offset_left = 853
+offset_top = 67
+offset_right = 1093
+offset_bottom = 240
 script = ExtResource("2_marker")
 LocationId = "strange_oak"
 
 [node name="Bushes" type="Control" parent="."]
-offset_left = 1554
-offset_top = 474
-offset_right = 1646
-offset_bottom = 566
+offset_left = 1413
+offset_top = 400
+offset_right = 1700
+offset_bottom = 627
 script = ExtResource("2_marker")
 LocationId = "bushes"
 
 [node name="Inn" type="Control" parent="."]
-offset_left = 1029
-offset_top = 609
-offset_right = 1121
-offset_bottom = 701
+offset_left = 980
+offset_top = 600
+offset_right = 1147
+offset_bottom = 720
 script = ExtResource("2_marker")
 LocationId = "inn"
 ShowIf = "inn_known"

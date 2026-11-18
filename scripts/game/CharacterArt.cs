@@ -31,6 +31,12 @@ public static class CharacterArt
 		!ResourceLoader.Exists($"res://assets/art/characters/{id}.png") && ResourceLoader.Exists($"res://assets/art/items/{id}.png");
 
 	/// <summary>
+	/// People who only appear at night and whose sprites are painted in the night light
+	/// already (moonlight, the church lantern), so they aren't tinted again.
+	/// </summary>
+	public static bool IsNightLit(string id) => id is "priest" or "gravedigger";
+
+	/// <summary>
 	/// The character a speaker name refers to: matched against the display names in
 	/// translations/ui.csv (char_&lt;id&gt;) in the current language, or the id itself.
 	/// Empty when nobody matches.

@@ -184,7 +184,12 @@ public partial class GameHud : CanvasLayer
 		_closeHint.AddThemeFontSizeOverride("font_size", 28);
 		_closeHint.AddThemeColorOverride("font_color", new Color(0.92f, 0.84f, 0.68f, 0.75f));
 		frame.AddChild(_closeHint);
+
+		_journalCandle = Night.Candlelight(new Vector2(0.5f, 0.5f));
+		_journal.AddChild(_journalCandle);
 	}
+
+	private ColorRect _journalCandle;
 
 	private static RichTextLabel Page(Control parent, Rect2 area, Font hand, float tiltDegrees)
 	{
@@ -224,6 +229,7 @@ public partial class GameHud : CanvasLayer
 		_toastTween?.Kill();
 		_toast.Hide();
 		FillJournal();
+		_journalCandle.Visible = Night.IsNight;
 		_journal.Modulate = new Color(1, 1, 1, 0);
 		_journal.Show();
 		CreateTween().TweenProperty(_journal, "modulate:a", 1f, 0.25f);

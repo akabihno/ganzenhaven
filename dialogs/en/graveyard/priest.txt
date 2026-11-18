@@ -1,6 +1,4 @@
 # PLACEHOLDER — replace with your dialogue.
+# The priest is only here at night, after the Tavern Keeper's death.
 @show priest
-@if tavern_keeper_dead
-  Priest: [placeholder — after the Tavern Keeper's death]
-@else
-  Priest: [placeholder — before]
+Priest: [placeholder]

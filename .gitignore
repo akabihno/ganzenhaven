@@ -33,3 +33,6 @@ translations/*.translation
 # Generation logs from tools/elevenlabs_*.py
 audio/**/*.log
 __pycache__/
+
+# Meshy sources of the dancing fox (re-downloadable from task.json / rig.json); the game uses fox.glb
+assets/models/fox/source/*.glb

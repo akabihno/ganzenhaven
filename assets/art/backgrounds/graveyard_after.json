@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1eee0-a4bc-7632-8bb2-ecd9b637166c",
+  "prompt": "Exactly the same photograph, same framing, same composition and every object in the same place, but at night: deep blue moonlit darkness, cold silvery moonlight, long soft shadows, a little fog. A single lantern burns by the church door; the gravestones catch the moonlight.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/graveyard.png"
+  ],
+  "consumed_credits": 6
+}
