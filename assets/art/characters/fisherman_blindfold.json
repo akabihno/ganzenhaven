@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ee7b-c0ab-742a-abc5-6e49fa27c15a",
+  "prompt": "Exactly the same image of the old fisherman, same full-body framing from cap to boots with both feet visible, same size and position in the frame, same pose, clothes and rope. The only change: a strip of coarse beige burlap is tied over his eyes as a blindfold. Same painted style, plain background.",
+  "model": "nano-banana-2",
+  "aspect": "3:4",
+  "references": [
+    "assets/art/characters/fisherman.png"
+  ],
+  "consumed_credits": 6
+}

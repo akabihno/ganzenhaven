@@ -1,2 +1,8 @@
-# PLACEHOLDER — replace with your dialogue.
-[placeholder] Old nets hung on the wall to dry.
+@if fisherman_blindfolded and !fish_caught and !item:nets
+  The Fisherman's nets, hung on the wall to look nautical.
+  * Take them back for him.
+    $item nets
+    $set nets_taken
+    Nobody stops you. The wall looks less nautical.
+@else
+  Old nets hung on the wall to dry.

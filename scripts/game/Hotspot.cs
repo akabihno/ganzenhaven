@@ -5,6 +5,11 @@ using Godot;
 /// Size the rectangle over the object in the editor; hovering shows a soft glow and the
 /// label, clicking runs <see cref="Dialogue"/>.
 /// </summary>
+/// <remarks>
+/// Something the player can take away is cut out of the background into <see cref="Picture"/>
+/// (drawn to fill the rectangle) with the gap in the background painted over, and the hotspot
+/// gets <c>HideIf = item:&lt;id&gt;</c>: once picked up, it's gone from the scene.
+/// </remarks>
 [Tool]
 [GlobalClass]
 public partial class Hotspot : Control
@@ -14,6 +19,19 @@ public partial class Hotspot : Control
 
 	/// <summary>Dialogue script id, e.g. "harbor/crane".</summary>
 	[Export] public string Dialogue { get; set; } = "";
+
+	/// <summary>Instead of a dialogue, opens a book: "ledger", "journal" or "inventory".</summary>
+	[Export] public string Opens { get; set; } = "";
+
+	private bool Clickable => Interactive && (!string.IsNullOrEmpty(Dialogue) || !string.IsNullOrEmpty(Opens));
+
+	/// <summary>Optional picture drawn over the background, filling the rectangle.</summary>
+	[Export] public Texture2D Picture
+	{
+		get => _picture;
+		set { _picture = value; QueueRedraw(); }
+	}
+	private Texture2D _picture;
 
 	[Export] public string ShowIf { get; set; } = "";
 	[Export] public string HideIf { get; set; } = "";
@@ -52,6 +70,8 @@ public partial class Hotspot : Control
 
 	public override void _Draw()
 	{
+		if (_picture != null)
+			DrawTextureRect(_picture, new Rect2(Vector2.Zero, Size), false);
 		if (Engine.IsEditorHint())
 		{
 			// Placement guide, editor only.
@@ -78,7 +98,7 @@ public partial class Hotspot : Control
 
 	private void SetHover(bool on)
 	{
-		bool active = on && Interactive && !string.IsNullOrEmpty(Dialogue);
+		bool active = on && Clickable;
 		_target = active ? 1f : 0f;
 		MouseDefaultCursorShape = active ? CursorShape.PointingHand : CursorShape.Arrow;
 		if (active)
@@ -101,11 +121,17 @@ public partial class Hotspot : Control
 
 	private void OnGuiInput(InputEvent e)
 	{
-		if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && Interactive && !string.IsNullOrEmpty(Dialogue))
+		if (e is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left } && Clickable)
 		{
 			SetHover(false);
-			Game.Instance.RunDialogue(Dialogue);
 			AcceptEvent();
+			switch (Opens)
+			{
+				case "ledger": Game.Instance.Hud.OpenLedger(); break;
+				case "journal": Game.Instance.Hud.OpenJournal(); break;
+				case "inventory": Game.Instance.Hud.OpenInventory(); break;
+				default: Game.Instance.RunDialogue(Dialogue); break;
+			}
 		}
 	}
 }

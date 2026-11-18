@@ -43,7 +43,7 @@ offset_right = 1050
 offset_bottom = 830
 script = ExtResource("3_hot")
 LabelKey = "hs_ledger"
-Dialogue = "office/ledger"
+Opens = "ledger"
 
 [node name="Hearth" type="Control" parent="."]
 offset_left = 0

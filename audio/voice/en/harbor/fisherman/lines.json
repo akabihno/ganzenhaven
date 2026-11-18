@@ -1,0 +1,80 @@
+{
+  "b2425f4842c7": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "The fish is yours, Harbourmaster. Mind which way it's facing.",
+    "sent": "[old, gruff, suspicious] The fish is yours, Harbourmaster. Mind which way it's facing."
+  },
+  "a02bb6189643": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Peace at last. Not a single eye on me.",
+    "sent": "[old, gruff, suspicious] Peace at last. Not a single eye on me."
+  },
+  "e92f32634e43": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Only I can't fish with my bare hands. The Tavern Keeper took my nets to hang on his wall.",
+    "sent": "[old, gruff, suspicious] Only I can't fish with my bare hands. The Tavern Keeper took my nets to hang on his wall."
+  },
+  "1af4ca8a49ea": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Hemp, cork, a whiff of beer. That's them.",
+    "sent": "[old, gruff, suspicious] Hemp, cork, a whiff of beer. That's them."
+  },
+  "0c098be5a6a6": {
+    "speaker": "",
+    "expression": "",
+    "text": "He casts the net without looking, and hauls it back with one fat cod in it.",
+    "sent": "[calm, storytelling] He casts the net without looking, and hauls it back with one fat cod in it."
+  },
+  "a1ae2282da26": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Take it. I'd rather not know what it thinks of me.",
+    "sent": "[old, gruff, suspicious] Take it. I'd rather not know what it thinks of me."
+  },
+  "e90e2253ba16": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Harbourmaster! The fish are looking at me.",
+    "sent": "[old, gruff, suspicious] Harbourmaster! The fish are looking at me."
+  },
+  "daefb6a1d3fa": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Judgementally.",
+    "sent": "[old, gruff, suspicious] Judgementally."
+  },
+  "ba0660195a7d": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "These ones do.",
+    "sent": "[old, gruff, suspicious] These ones do."
+  },
+  "c5c9cd86a8c3": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "...",
+    "sent": "[old, gruff, suspicious] [long, contented sigh] Hmm."
+  },
+  "51f833563ab1": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Oh. Oh, that's better. Let them look all they like.",
+    "sent": "[old, gruff, suspicious] Oh. Oh, that's better. Let them look all they like."
+  },
+  "b31ee333fe9b": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "Now I could fish in peace. If only I had my nets.",
+    "sent": "[old, gruff, suspicious] Now I could fish in peace. If only I had my nets."
+  },
+  "30f01cea0184": {
+    "speaker": "Fisherman",
+    "expression": "",
+    "text": "...and now they whisper.",
+    "sent": "[old, gruff, suspicious] ...and now they whisper."
+  }
+}

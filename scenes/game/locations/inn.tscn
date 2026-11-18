@@ -1,0 +1,64 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
+[ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
+[ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+
+[node name="Inn" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_loc")
+LocationId = "inn"
+MusicId = "tavern"
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 6
+
+[node name="ShipModel" type="Control" parent="."]
+offset_left = 300
+offset_top = 220
+offset_right = 480
+offset_bottom = 440
+script = ExtResource("3_hot")
+LabelKey = "hs_inn_ship_model"
+Dialogue = "inn/ship_model"
+
+[node name="Charts" type="Control" parent="."]
+offset_left = 480
+offset_top = 770
+offset_right = 960
+offset_bottom = 900
+script = ExtResource("3_hot")
+LabelKey = "hs_inn_charts"
+Dialogue = "inn/charts"
+
+[node name="Stairs" type="Control" parent="."]
+offset_left = 1420
+offset_top = 170
+offset_right = 1780
+offset_bottom = 880
+script = ExtResource("3_hot")
+LabelKey = "hs_inn_stairs"
+Dialogue = "inn/stairs"
+
+[node name="Captain" type="Control" parent="."]
+offset_left = 1100
+offset_top = 260
+offset_right = 1405
+offset_bottom = 980
+script = ExtResource("2_spot")
+CharacterId = "captain"
+Dialogue = "inn/captain"
+Height = 720.0

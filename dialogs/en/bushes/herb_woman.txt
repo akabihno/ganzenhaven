@@ -1,6 +1,11 @@
-# PLACEHOLDER — replace with your dialogue.
 @show herb_woman
 @if tavern_keeper_dead
   Herb Woman: [placeholder — after the Tavern Keeper's death]
 @else
-  Herb Woman: [placeholder — before]
+  * Can I take this piece of cloth?
+    Herb Woman: Sure, sweetheart, if only you can help me find belladonna root, plantain, ...
+    * Yes?
+      Herb Woman: I am kidding, this is not one of these.
+      * What "these"?
+        Herb Woman: Never mind, feel free to take this old rag, I can find my herbs myself.
+        $set cloth_allow

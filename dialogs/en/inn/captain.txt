@@ -1,0 +1,19 @@
+@show captain
+@if done:collect_debt
+  Captain Vos: Paid in full, Harbourmaster. Now let a man drink.
+@elif journal:collect_debt
+  Captain Vos: Harbourmaster. Sit, if you're drinking. Stand, if you're counting.
+  * The Zwaluw owes two guldens: mooring and porterage.  @leave
+    Captain Vos: Two guldens! For a quay full of gulls and a porter who sings.
+    * It's written in the ledger.  @leave
+      Captain Vos: Written. Everything's written with you people.
+      Captain Vos: There. Two guldens. Count them.
+      $add stuivers 40
+      $journal done find_captain
+      $journal done collect_debt
+    * Fine, finish your drink first.  @leave
+      Captain Vos: I intend to.
+  * Just looking around.
+    Captain Vos: Look somewhere else.
+@else
+  Captain Vos: I'm drinking, Harbourmaster. Whatever it is, it can wait.

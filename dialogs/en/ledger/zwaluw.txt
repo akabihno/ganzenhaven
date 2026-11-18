@@ -1,0 +1,7 @@
+# Clicking the Zwaluw's line in the ledger's debts.
+@if journal:collect_debt
+  \Still unpaid: two guldens for the Zwaluw. The Dock Worker signed for the porterage.
+@else
+  \The Zwaluw, master Joris Vos. Mooring and porterage: two guldens, unpaid.
+  The porterage was signed for by the Dock Worker.
+  $journal collect_debt

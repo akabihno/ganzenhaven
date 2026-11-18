@@ -29,9 +29,10 @@ public partial class MapScreen : Control
 		AddChild(title);
 
 		_back = new Button { Text = Tr("btn_back"), CustomMinimumSize = new Vector2(200, 64) };
-		_back.SetAnchorsPreset(LayoutPreset.TopRight);
-		_back.OffsetLeft = GameHud.ScreenButtonRight - 200;
-		_back.OffsetRight = GameHud.ScreenButtonRight;
+		// Top-left: the map's title is in the middle, the HUD buttons on the right.
+		_back.SetAnchorsPreset(LayoutPreset.TopLeft);
+		_back.OffsetLeft = 48;
+		_back.OffsetRight = 248;
 		_back.OffsetTop = 32;
 		_back.OffsetBottom = 96;
 		_back.Pressed += Back;

@@ -23,7 +23,15 @@ public partial class CharacterSpot : Control
 		set { _characterId = value; Rebuild(); }
 	}
 
-	[Export] public string Expression { get; set; } = "";
+	/// <summary>Which sprite to stand with: assets/art/characters/&lt;id&gt;_&lt;expression&gt;.png
+	/// (e.g. the fisherman's "blindfold"). Empty for the plain one.</summary>
+	[Export]
+	public string Expression
+	{
+		get => _expression;
+		set { _expression = value; Rebuild(); }
+	}
+	private string _expression = "";
 
 	/// <summary>Dialogue script id, e.g. "harbor/fisherman" for dialogs/&lt;lang&gt;/harbor/fisherman.txt.</summary>
 	[Export] public string Dialogue { get; set; } = "";
@@ -81,7 +89,7 @@ public partial class CharacterSpot : Control
 			};
 			AddChild(_sprite, false, InternalMode.Front);
 		}
-		var tex = string.IsNullOrEmpty(_characterId) ? null : CharacterArt.Load(_characterId);
+		var tex = string.IsNullOrEmpty(_characterId) ? null : CharacterArt.Load(_characterId, _expression);
 		_sprite.Texture = tex;
 		_sprite.FlipH = _flip;
 		float width = tex == null ? _height * 0.4f : _height * tex.GetWidth() / tex.GetHeight();

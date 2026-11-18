@@ -1,0 +1,4 @@
+A pair of iron scissors on the table, still warm. The cat was sitting on them.
+* Take them.  @leave
+  $item scissors
+* Leave them.  @leave

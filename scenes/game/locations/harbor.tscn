@@ -61,6 +61,19 @@ script = ExtResource("2_spot")
 CharacterId = "fisherman"
 Dialogue = "harbor/fisherman"
 Height = 520.0
+HideIf = "fisherman_blindfolded"
+
+[node name="FishermanBlindfolded" type="Control" parent="."]
+offset_left = 454
+offset_top = 445
+offset_right = 654
+offset_bottom = 965
+script = ExtResource("2_spot")
+CharacterId = "fisherman"
+Expression = "blindfold"
+Dialogue = "harbor/fisherman"
+Height = 520.0
+ShowIf = "fisherman_blindfolded"
 
 [node name="DockWorker" type="Control" parent="."]
 offset_left = 1133

@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ee3e-bd8d-7017-bbeb-518c10f18e10",
+  "prompt": "The same dark oak table seen from directly above, in exactly the same painted style, wood grain and warm candlelight, but with no book on it: the bare worn wooden tabletop fills the whole frame, with only the inkwell and the quill pushed into the bottom-left corner. Leave the rest of the table completely clear and empty.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/journal/journal_book.png"
+  ],
+  "consumed_credits": 6
+}

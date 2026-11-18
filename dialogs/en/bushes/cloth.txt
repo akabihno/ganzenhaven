@@ -1,2 +1,6 @@
-# PLACEHOLDER — replace with your dialogue.
-[placeholder] A scrap of cloth caught on a thorn.
+@show cloth
+A scrap of cloth caught on a thorn.
+@if cloth_allow
+  * Take
+    @hide cloth
+    $item cloth

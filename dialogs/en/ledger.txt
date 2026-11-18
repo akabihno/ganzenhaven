@@ -1,0 +1,35 @@
+# The harbour ledger, opened from the Harbourmaster's office.
+# "== Title" starts a page; two pages show at a time. One row per line, cells split by "|";
+# the first row of a page is the column headings.
+# "-> script" at the end of a row makes it clickable: it runs dialogs/<language>/<script>.txt.
+# "@if condition" at the very end shows the row only while the condition holds.
+
+== Ships in harbour
+Ship | Master | From | Berth
+Zwaluw, cog | Joris Vos | Bergen | quay 3
+Sint Pieter, cog | Hinrik Brandt | Lübeck | quay 1
+Margriet, hulk | Claes Wouters | Bruges | quay 2
+Grey Goose, smack | the Fisherman | here | the beach
+
+== Cargo
+Ship | Goods | Amount
+Zwaluw | stockfish | 40 bundles
+Sint Pieter | salt | 12 lasts
+Sint Pieter | beeswax | 9 barrels
+Margriet | Flemish cloth | 30 bales
+Margriet | Rhenish wine | 6 tuns
+Grey Goose | fish | none (they look at him)
+
+== Dues received
+Who | For | Paid
+Sint Pieter | anchorage, 6 days | 1 gulden, 4 stuivers
+Margriet | crane, 30 bales | 15 stuivers
+Tavern Keeper | drying nets on the quay | in beer
+Herb Woman | a crate of "herbs" | no questions asked
+
+== Debts outstanding
+Debtor | For | Owed
+Gravedigger | a lost oar | 3 stuivers
+Dock Worker, for the Zwaluw | mooring and porterage | 2 guldens -> ledger/zwaluw @if !done:collect_debt
+Dock Worker, for the Zwaluw | mooring and porterage | paid by Captain Vos @if done:collect_debt
+Seagull | one window | to be discussed

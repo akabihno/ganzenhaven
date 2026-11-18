@@ -97,7 +97,14 @@ public partial class LocationScreen : Control, IStage
 	{
 		foreach (var node in FindChildren("*", "", true, false))
 		{
-			if (node is CharacterSpot spot) spot.Refresh();
+			if (node is CharacterSpot spot)
+			{
+				spot.Refresh();
+				// Whoever is on screen in a conversation isn't also standing in the room: story
+				// changes mid-conversation (paying, a flag) must not bring the small figure back.
+				if (_shown.ContainsKey(spot.CharacterId))
+					spot.Visible = false;
+			}
 			else if (node is Hotspot hotspot) hotspot.Refresh();
 		}
 		if (_mapButton != null)

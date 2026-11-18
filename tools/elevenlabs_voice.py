@@ -2,6 +2,8 @@
 """Voice dialogue lines with ElevenLabs.
 
     python3 tools/elevenlabs_voice.py office/seagull [more/scripts ...] [--lang en ru] [--force] [--dry-run]
+    python3 tools/elevenlabs_voice.py --all       every dialog script, plus the items
+    python3 tools/elevenlabs_voice.py items       the inventory items, read by the author
 
 For every speaker line of dialogs/<lang>/<script>.txt whose character has a voice in
 tools/voices.json, writes audio/voice/<lang>/<script>/<key>.mp3, where <key> is the first 12
@@ -9,6 +11,10 @@ hex digits of sha1("<speaker>|<text>") — exactly what the game computes for th
 showing (DialogueRunner.VoiceKey). Edit a line and its key changes: the old recording stops
 playing, and running this again voices the new text. Existing files are kept unless --force.
 Recordings for lines that no longer exist are removed. Player choices (* lines) are not voiced.
+
+"items" voices dialogs/<lang>/items.txt instead: the author reads "Name. Description." for each
+item into audio/voice/<lang>/items/<id>.mp3 (redone when the text changes), which the inventory
+plays when a thing is clicked.
 """
 import argparse, csv, hashlib, json, os, pathlib, re, sys, time, urllib.request, urllib.error
 
@@ -84,18 +90,78 @@ def tts(voice_id, text):
             sys.exit(f"tts -> {e.code}: {e.read().decode()[:400]}")
 
 
+# Files in dialogs/<lang>/ that are not conversations.
+NOT_SCRIPTS = {"journal", "items", "ledger"}
+
+
+def all_scripts():
+    root = ROOT / "dialogs" / "en"
+    found = sorted(str(f.relative_to(root).with_suffix("")) for f in root.rglob("*.txt"))
+    return [s for s in found if s not in NOT_SCRIPTS] + ["items"]
+
+
+def item_texts(lang):
+    """id -> "Name. Description." from dialogs/<lang>/items.txt."""
+    items, current = {}, None
+    path = ROOT / "dialogs" / lang / "items.txt"
+    if not path.exists():
+        return items
+    for raw in path.read_text(encoding="utf-8").lstrip("\ufeff").splitlines():
+        t = raw.strip()
+        if not t or t.startswith("#"):
+            continue
+        if raw[0] in " \t":
+            if current:
+                items[current] = f"{items[current]} {t}" if items[current].endswith(".") else f"{items[current]}. {t}"
+            continue
+        if ":" in t:
+            current, name = (x.strip() for x in t.split(":", 1))
+            items[current] = name
+    return items
+
+
+def voice_items(lang, force, dry_run):
+    narrator = CONFIG["voices"]["narrator"]
+    out_dir = ROOT / "audio/voice" / lang / "items"
+    manifest_path = out_dir / "lines.json"
+    old = json.loads(manifest_path.read_text(encoding="utf-8")) if manifest_path.exists() else {}
+    manifest = {}
+    for item_id, text in item_texts(lang).items():
+        line = f"{narrator.get('direction', '')} {spoken(text)}".strip()
+        manifest[item_id] = {"text": text, "sent": line}
+        dst = out_dir / f"{item_id}.mp3"
+        if dst.exists() and not force and old.get(item_id, {}).get("text") == text:
+            print(f"  = {lang} items/{item_id}: {text}")
+            continue
+        print(f"  + {lang} items/{item_id}: {line}")
+        if not dry_run:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            dst.write_bytes(tts(narrator["voice_id"], line))
+    if not dry_run and manifest:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("scripts", nargs="+")
+    p.add_argument("scripts", nargs="*")
+    p.add_argument("--all", action="store_true")
     p.add_argument("--lang", nargs="+", default=["en", "ru"])
     p.add_argument("--force", action="store_true")
     p.add_argument("--dry-run", action="store_true")
     a = p.parse_args()
 
+    if a.all:
+        a.scripts = all_scripts()
+    if not a.scripts:
+        p.error("name some scripts, or --all")
     names = character_names()
     skip = CONFIG.get("skip_lines_containing", [])
     for lang in a.lang:
         for script in a.scripts:
+            if script == "items":
+                voice_items(lang, a.force, a.dry_run)
+                continue
             src = ROOT / "dialogs" / lang / f"{script}.txt"
             if not src.exists():
                 print(f"skip {src} (missing)")

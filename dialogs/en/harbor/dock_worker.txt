@@ -1,6 +1,14 @@
-# PLACEHOLDER — replace with your dialogue.
 @show dock_worker
 @if tavern_keeper_dead
   Dock Worker: [placeholder — after the Tavern Keeper's death]
+@elif journal:collect_debt and !inn_known
+  Dock Worker: Harbourmaster.
+  * The ledger says you owe two guldens for the Zwaluw.
+    Dock Worker: _I_ owe? I carried the man's stockfish, that's all I did.
+    Dock Worker: It's Captain Vos who owes you. He's been sitting in the Inn since they tied up.
+    $set inn_known
+    $journal find_captain
+@elif journal:collect_debt
+  Dock Worker: Captain Vos. The Inn. I'm not paying for his fish.
 @else
   Dock Worker: [placeholder — before]

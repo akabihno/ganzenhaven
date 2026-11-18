@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ee7a-8395-719c-9735-6785007aeddc",
+  "prompt": "A narrow strip cut from this same coarse beige burlap, folded lengthwise into a blindfold band with two long tie ends and frayed edges, lying loosely curved, seen from above, realistic painted illustration, soft warm candlelight, isolated object on a plain background",
+  "model": "nano-banana-2",
+  "aspect": "1:1",
+  "references": [
+    "assets/art/items/cloth.png"
+  ],
+  "consumed_credits": 6
+}

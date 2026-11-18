@@ -4,6 +4,8 @@ using Godot;
 /// Where character art lives: assets/art/characters/&lt;id&gt;.png, with expressions as
 /// &lt;id&gt;_&lt;expression&gt;.png (falling back to the plain sprite when an expression is missing).
 /// Display names come from translations/ui.csv as <c>char_&lt;id&gt;</c>.
+/// <c>@show</c> also takes an inventory item id (assets/art/items/&lt;id&gt;.png): the item is
+/// held up close, above the text box.
 /// </summary>
 public static class CharacterArt
 {
@@ -18,9 +20,15 @@ public static class CharacterArt
 		string path = $"res://assets/art/characters/{id}.png";
 		if (ResourceLoader.Exists(path))
 			return GD.Load<Texture2D>(path);
+		if (ItemText.Picture(id) is { } item)
+			return item;
 		GD.PushWarning($"Missing character art {path}");
 		return null;
 	}
+
+	/// <summary>An inventory item rather than a character.</summary>
+	public static bool IsItem(string id) =>
+		!ResourceLoader.Exists($"res://assets/art/characters/{id}.png") && ResourceLoader.Exists($"res://assets/art/items/{id}.png");
 
 	/// <summary>
 	/// The character a speaker name refers to: matched against the display names in
@@ -54,6 +62,7 @@ public static class CharacterArt
 	public static float DialogueBaseline(string id) => id switch
 	{
 		"black_cat" or "seagull" => 0.74f,
+		_ when IsItem(id) => 0.7f,
 		_ => 1.04f,
 	};
 
@@ -62,6 +71,7 @@ public static class CharacterArt
 	{
 		"black_cat" => 0.36f,
 		"seagull" => 0.42f,
+		_ when IsItem(id) => 0.5f,
 		_ => 0.96f,
 	};
 }

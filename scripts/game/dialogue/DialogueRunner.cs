@@ -7,6 +7,12 @@ using static DialogueScript;
 /// Steps through a <see cref="DialogueScript"/>, keeping story logic (flags, conditions,
 /// jumps, calls) to itself and handing everything the player sees to the caller as events.
 /// </summary>
+/// <remarks>
+/// A choice menu comes back after the picked option's lines have run, without that option and
+/// with "That's all." added to move on; once every option has been picked, the conversation
+/// carries on after the menu. An option marked <c>@leave</c> closes the menu instead (decisions:
+/// pay or not, take or leave).
+/// </remarks>
 public sealed class DialogueRunner
 {
 	public abstract record Event;
@@ -23,11 +29,17 @@ public sealed class DialogueRunner
 		public int Index;
 		public DialogueScript Script;
 		public bool IsScriptRoot;
+
+		// A choice menu waiting on the stack: shown again whenever it comes back to the top.
+		public Choice Menu;
+		public HashSet<Option> Picked;
+		public bool ShownBefore;
 	}
 
 	private readonly Stack<Frame> _frames = new();
 	private readonly string _language;
 	private List<Option> _pendingOptions;
+	private bool _pendingDone;   // the last entry of the menu on screen is "That's all."
 	private int _guard;
 
 	public DialogueRunner(string scriptId, string language)
@@ -41,19 +53,26 @@ public sealed class DialogueRunner
 	/// <summary>Picks option <paramref name="index"/> of the last <see cref="ChoiceEvent"/>.</summary>
 	public void Choose(int index)
 	{
-		if (_pendingOptions == null || index < 0 || index >= _pendingOptions.Count)
+		if (_pendingOptions == null || index < 0 || index >= _pendingOptions.Count + (_pendingDone ? 1 : 0))
 			return;
-		var option = _pendingOptions[index];
+		var menu = _frames.Peek();
+		bool done = index == _pendingOptions.Count;
+		var option = done ? null : _pendingOptions[index];
 		_pendingOptions = null;
-		var top = _frames.Peek();
-		_frames.Push(new Frame { Block = option.Body, Script = top.Script });
+
+		if (done || option.Leave)
+			_frames.Pop();   // the menu is finished; carry on after it
+		else
+			menu.Picked.Add(option);
+		if (option != null && option.Body.Count > 0)
+			_frames.Push(new Frame { Block = option.Body, Script = menu.Script });
 	}
 
 	/// <summary>Runs until something needs the player or the stage.</summary>
 	public Event Next()
 	{
 		if (_pendingOptions != null)
-			return new ChoiceEvent(_pendingOptions.ConvertAll(o => o.Text));
+			return MenuEvent();
 
 		_guard = 0;
 		while (_frames.Count > 0)
@@ -65,6 +84,19 @@ public sealed class DialogueRunner
 			}
 
 			var frame = _frames.Peek();
+			if (frame.Menu != null)
+			{
+				var left = frame.Menu.Options.FindAll(o => !frame.Picked.Contains(o) && GameState.Instance.Check(o.Condition));
+				if (left.Count == 0)
+				{
+					_frames.Pop();
+					continue;
+				}
+				_pendingOptions = left;
+				_pendingDone = frame.ShownBefore;   // the first time, one of them must be picked
+				frame.ShownBefore = true;
+				return MenuEvent();
+			}
 			if (frame.Index >= frame.Block.Count)
 			{
 				_frames.Pop();
@@ -79,13 +111,8 @@ public sealed class DialogueRunner
 						$"res://audio/voice/{frame.Script.Language}/{frame.Script.Id}/{VoiceKey(say.Speaker, say.Text)}.mp3");
 
 				case Choice choice:
-				{
-					var visible = choice.Options.FindAll(o => GameState.Instance.Check(o.Condition));
-					if (visible.Count == 0)
-						continue;
-					_pendingOptions = visible;
-					return new ChoiceEvent(visible.ConvertAll(o => Interpolate(o.Text)));
-				}
+					_frames.Push(new Frame { Block = new List<Stmt>(), Script = frame.Script, Menu = choice, Picked = new HashSet<Option>() });
+					continue;
 
 				case If cond:
 				{
@@ -113,6 +140,14 @@ public sealed class DialogueRunner
 			}
 		}
 		return new EndEvent();
+	}
+
+	private ChoiceEvent MenuEvent()
+	{
+		var texts = _pendingOptions.ConvertAll(o => Interpolate(o.Text));
+		if (_pendingDone)
+			texts.Add(TranslationServer.Translate("choice_done").ToString());
+		return new ChoiceEvent(texts);
 	}
 
 	private Event Execute(Command cmd, Frame frame)
@@ -155,6 +190,16 @@ public sealed class DialogueRunner
 				else if (verb == "remove") state.JournalRemove(id);
 				else if (verb == "add") state.JournalAdd(id);
 				else Warn(cmd, frame, "$journal id | $journal done id | $journal remove id");
+				return null;
+			}
+			case "$item":
+			{
+				// "$item id" puts it in the inventory, "$item remove id" takes it out
+				string verb = cmd.Args.Length > 1 ? cmd.Args[0] : "add";
+				string id = cmd.Args.Length > 0 ? cmd.Args[^1] : "";
+				if (verb == "remove") state.ItemRemove(id);
+				else if (verb == "add") state.ItemAdd(id);
+				else Warn(cmd, frame, "$item id | $item remove id");
 				return null;
 			}
 			case "label":

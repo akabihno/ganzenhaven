@@ -1,19 +1,22 @@
 using Godot;
 
 /// <summary>
-/// The buttons that are there on every in-game screen (locations and the map): Journal and
-/// Menu, top-right. Also the journal (an open book on the map table) and the
-/// "new in the journal" notice.
+/// The buttons that are there on every in-game screen (locations and the map): Inventory,
+/// Journal and Menu, top-right. Also the journal (an open book on the map table), the
+/// inventory (<see cref="InventoryView"/>), the harbour ledger (<see cref="LedgerView"/>, opened
+/// from the office) and the "new in the journal / inventory" notice.
 /// Owned by <see cref="Game"/>; hidden on the main menu, in cutscenes and during dialogue.
 /// </summary>
 public partial class GameHud : CanvasLayer
 {
 	/// <summary>Right edge of the free space left of the HUD buttons, for a screen's own
 	/// button (Map, Back): place it at offsets [ScreenButtonRight - 200, ScreenButtonRight].</summary>
-	public const float ScreenButtonRight = -480f;
+	public const float ScreenButtonRight = -700f;
 
 	private Control _buttons;
-	private Button _journalButton, _menuButton;
+	private Button _journalButton, _menuButton, _inventoryButton;
+	private InventoryView _inventory;
+	private LedgerView _ledger;
 	private Control _journal;
 	private RichTextLabel _journalText;
 	private PanelContainer _toast;
@@ -26,8 +29,13 @@ public partial class GameHud : CanvasLayer
 		Layer = 40;
 		BuildButtons();
 		BuildJournal();
+		_inventory = new InventoryView { Name = "Inventory", Visible = false };
+		AddChild(_inventory);
+		_ledger = new LedgerView { Name = "Ledger", Visible = false };
+		AddChild(_ledger);
 		BuildToast();
 		GameState.Instance.JournalUpdated += OnJournalUpdated;
+		GameState.Instance.InventoryUpdated += OnInventoryUpdated;
 		GameState.Instance.LanguageChanged += _ => Relabel();
 		Relabel();
 	}
@@ -37,19 +45,44 @@ public partial class GameHud : CanvasLayer
 	{
 		_onGameScreen = on;
 		if (!on)
+		{
 			CloseJournal();
+			_inventory.Close();
+			_ledger.Close();
+		}
 	}
 
 	public override void _Process(double delta)
 	{
-		_buttons.Visible = _onGameScreen && !Game.Instance.Dialogue.IsActive && !_journal.Visible;
+		_buttons.Visible = _onGameScreen && !Game.Instance.Dialogue.IsActive && !_journal.Visible && !_inventory.Visible && !_ledger.Visible;
 	}
 
 	public override void _UnhandledInput(InputEvent e)
 	{
+		// A conversation running over an open book (a ledger row, combining things) has the keys.
+		if (Game.Instance.Dialogue.IsActive)
+			return;
+		if (_ledger.Visible)
+		{
+			if (e.IsActionPressed("ui_cancel"))
+				_ledger.Close();
+			else if (e.IsActionPressed("ui_left"))
+				_ledger.Turn(-1);
+			else if (e.IsActionPressed("ui_right"))
+				_ledger.Turn(1);
+			else
+				return;
+			GetViewport().SetInputAsHandled();
+			return;
+		}
 		if (_journal.Visible && (e.IsActionPressed("ui_cancel") || e.IsActionPressed("ui_accept")))
 		{
 			CloseJournal();
+			GetViewport().SetInputAsHandled();
+		}
+		else if (_inventory.Visible && (e.IsActionPressed("ui_cancel") || e.IsActionPressed("ui_accept")))
+		{
+			_inventory.Close();
 			GetViewport().SetInputAsHandled();
 		}
 	}
@@ -58,8 +91,13 @@ public partial class GameHud : CanvasLayer
 	{
 		_journalButton.Text = Tr("btn_journal");
 		_menuButton.Text = Tr("btn_menu");
+		_inventoryButton.Text = Tr("btn_inventory");
 		if (_journal.Visible)
 			FillJournal();
+		if (_inventory.Visible)
+			_inventory.Fill();
+		if (_ledger.Visible)
+			_ledger.Fill();
 	}
 
 	// ---------------------------------------------------------------- buttons
@@ -74,6 +112,8 @@ public partial class GameHud : CanvasLayer
 		_menuButton.Pressed += () => Game.Instance.GoToMenu();
 		_journalButton = HudButton(-460);
 		_journalButton.Pressed += OpenJournal;
+		_inventoryButton = HudButton(-680);
+		_inventoryButton.Pressed += OpenInventory;
 	}
 
 	private Button HudButton(float left)
@@ -191,6 +231,24 @@ public partial class GameHud : CanvasLayer
 
 	private void CloseJournal() => _journal?.Hide();
 
+	public void OpenLedger()
+	{
+		_toastTween?.Kill();
+		_toast.Hide();
+		_ledger.Modulate = new Color(1, 1, 1, 0);
+		_ledger.Open();
+		CreateTween().TweenProperty(_ledger, "modulate:a", 1f, 0.25f);
+	}
+
+	public void OpenInventory()
+	{
+		_toastTween?.Kill();
+		_toast.Hide();
+		_inventory.Modulate = new Color(1, 1, 1, 0);
+		_inventory.Open();
+		CreateTween().TweenProperty(_inventory, "modulate:a", 1f, 0.25f);
+	}
+
 	private void FillJournal()
 	{
 		var state = GameState.Instance;
@@ -213,13 +271,14 @@ public partial class GameHud : CanvasLayer
 			{
 				if (JournalText.Parent(step.Id, lang) != task.Id)
 					continue;
-				page.Append("[font_size=38]      ");
+				// Indented as a block, so a step that wraps stays under its task.
+				page.Append("[indent][font_size=38]");
 				string stepText = JournalText.Get(step.Id, lang);
 				if (crossed || step.Done)
 					page.Append($"[color=#{FadedInk.ToHtml()}][s]").Append(stepText).Append("[/s][/color]");
 				else
 					page.Append("– ").Append(stepText);
-				page.Append("[/font_size]\n");
+				page.Append("[/font_size][/indent]\n");
 			}
 		}
 
@@ -295,7 +354,17 @@ public partial class GameHud : CanvasLayer
 		string task = JournalText.Parent(id, lang);
 		if (task.Length > 0 && FindEntry(task) != null)
 			entry = $"{JournalText.Get(task, lang)} — {entry}";
-		_toastText.Text = $"{Tr(done ? "journal_done" : "journal_new")}: {entry}";
+		Notice($"{Tr(done ? "journal_done" : "journal_new")}: {entry}");
+	}
+
+	private void OnInventoryUpdated(string id, bool added)
+	{
+		Notice($"{Tr(added ? "inventory_new" : "inventory_gone")}: {ItemText.Name(id, GameState.Instance.Language)}");
+	}
+
+	private void Notice(string text)
+	{
+		_toastText.Text = text;
 		_toastTween?.Kill();
 		_toast.Modulate = new Color(1, 1, 1, 0);
 		_toast.Show();

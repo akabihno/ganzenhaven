@@ -1,0 +1,4 @@
+# Using the scissors on the piece of cloth in the inventory.
+You cut a long strip from the cloth and fold it double. A blindfold, more or less.
+$item remove cloth
+$item blindfold

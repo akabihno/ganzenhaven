@@ -42,8 +42,22 @@ Russian file writes `Рыбак:`. `_word_` is shown in italics; BBCode works to
 * Ask about the tavern  @if !tavern_keeper_dead      option only shown while the condition holds
 ```
 
-Everything that should happen after picking an option must be indented under it. A line at
-the same level as the `*` lines ends the choice: it runs whichever option was picked.
+Everything that should happen after picking an option must be indented under it.
+
+When an option's lines are done, the same choices come back **without the one just picked**,
+plus "That's all." to move on, so the player can ask about everything in turn. Once every
+option has been picked (or "That's all." is chosen), the script carries on after the choices.
+A single option, or a chain of them nested inside each other, simply runs through.
+
+An option that is a decision rather than a topic ends with `@leave`: picking it closes the
+choices for good (it can go before or after `@if`):
+
+```
+* Pay two stuivers.  @leave
+  $add stuivers -2
+* On second thought, no.  @leave
+* Here are your nets.  @if item:nets @leave
+```
 
 ```
 
@@ -92,6 +106,79 @@ find_fish: Find fish
 Add a step only while its task is open (check `journal:<task>`); a step whose task isn't in the
 journal is written as a task of its own. `$journal remove <task>` removes its steps too.
 
+## Inventory
+
+Things the player carries. A script gives one and takes it back:
+
+```
+$item cloth              puts it in the inventory (with a "Picked up" notice)
+$item remove cloth       takes it out again
+@if item:cloth           the player has it
+```
+
+Names and descriptions are in `dialogs/en/items.txt` and `dialogs/ru/items.txt`, one
+`id: name` per line with an optional description indented under it:
+
+```
+cloth: Piece of cloth
+  A scrap of coarse burlap, torn off a thorn.
+```
+
+Clicking a thing in the inventory has the author read its name and description
+(`python3 tools/elevenlabs_voice.py items` records them).
+
+The picture is `assets/art/items/<id>.png` (transparent background). `@show <id>` holds the
+item up close above the text box, and `@hide <id>` puts it down.
+
+Something lying in a location that can be picked up is a hotspot with its own **Picture**,
+cut out of the background, and **HideIf** `item:<id>`, so it disappears once taken (see the
+Cloth in scenes/game/locations/bushes.tscn).
+
+### Using two things together
+
+In the inventory, click one thing and then another. That runs
+`dialogs/<lang>/combine/<a>_<b>.txt`, with the two ids in alphabetical order, which does the
+rest with `$item`:
+
+```
+# combine/cloth_scissors.txt
+You cut a long strip from the cloth and fold it double. A blindfold, more or less.
+$item remove cloth
+$item blindfold
+```
+
+No such file: "These don't go together."
+
+### Money
+
+The purse is the variable `stuivers` (20 stuivers make a gulden), shown in the inventory as
+"1 gulden, 18 stuivers":
+
+```
+$add stuivers 40          two guldens
+$add stuivers -2          pay for a pint
+@if stuivers >= 2
+```
+
+For scale: in the Dutch towns a pint of beer cost about a stuiver, a master carpenter earned
+about a gulden a day.
+
+## Ledger
+
+The harbour ledger in the office (the Ledger hotspot has **Opens** `ledger` instead of a
+Dialogue) is written in `dialogs/en/ledger.txt` and `dialogs/ru/ledger.txt`:
+
+```
+== Debts outstanding                                    a new page, with its title
+Debtor | For | Owed                                     columns split by |; first row = headings
+Gravedigger | a lost oar | 3 stuivers
+Dock Worker, for the Zwaluw | mooring | 2 guldens -> ledger/zwaluw @if !done:collect_debt
+```
+
+`-> script` makes the row clickable (it runs that script over the open book); `@if` at the very
+end shows the row only while the condition holds. Pages are shown two at a time and turned
+with the arrows. A hotspot can also have **Opens** `journal` or `inventory`.
+
 ## The two acts
 
 **`tavern_keeper_dead`** is the one flag the game itself knows: setting it starts the second
@@ -120,7 +207,13 @@ Sprites are `assets/art/characters/<id>.png`; an expression is `<id>_<expression
 (falls back to the plain sprite until it exists). An expression sprite should be cropped to the
 same size as the plain one, so swapping doesn't make the character jump.
 
-Expressions so far: `seagull tilt` (head cocked, asking).
+Expressions so far: `seagull tilt` (head cocked, asking), `fisherman blindfold`.
+
+Someone standing in a location (a CharacterSpot) can stand with an expression too
+(**Expression** field), and can have a second spot elsewhere that takes over through
+ShowIf / HideIf: the blindfolded fisherman in the harbour, the Tavern Keeper behind the counter
+(`keeper_at_counter`) with the cat on it (`cat_on_counter`). The counter front is cut out of the
+tavern background (tavern_counter_front.png) and drawn over him, so he stands behind it.
 
 ## Voice
 
@@ -129,9 +222,14 @@ Lines are voiced with ElevenLabs by `tools/elevenlabs_voice.py`:
 ```
 python3 tools/elevenlabs_voice.py office/seagull                 both languages
 python3 tools/elevenlabs_voice.py office/seagull --lang ru --force
+python3 tools/elevenlabs_voice.py --all                          everything, items too
 ```
 
-Who speaks with which voice is in `tools/voices.json` (the seagull is Lily), including a
+`--all` only records what's new or changed, so it's the one to run after editing.
+
+Who speaks with which voice is in `tools/voices.json`: the author Bill, the Seagull Lily,
+the Black Cat Roger, the Herb Woman Alice, the Tavern Keeper George, the Dock Worker Charlie,
+the Fisherman Harry and Captain Vos Brian. It also has a
 delivery direction per character and per expression (`Seagull [tilt]:` lines sound curious).
 Each recording is named after its line's text, so after you edit a line it simply stops
 playing until you run the tool again; recordings of deleted lines are removed. Player

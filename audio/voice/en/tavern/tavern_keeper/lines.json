@@ -1,0 +1,62 @@
+{
+  "16e71dc6ebf7": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "Another pint, Harbourmaster? Same price as the first.",
+    "sent": "[warm, tired, hearty] Another pint, Harbourmaster? Same price as the first."
+  },
+  "6fae37c49888": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "Harbourmaster! Can I get you anything to drink?",
+    "sent": "[warm, tired, hearty] Harbourmaster! Can I get you anything to drink?"
+  },
+  "d9e300e8ca00": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "Two stuivers, then. That's the harbour price.",
+    "sent": "[warm, tired, hearty] Two stuivers, then. That's the harbour price."
+  },
+  "baefd5e74526": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "Coming right up.",
+    "sent": "[warm, tired, hearty] Coming right up."
+  },
+  "9a043201dd2b": {
+    "speaker": "",
+    "expression": "",
+    "text": "The Tavern Keeper goes behind the counter. The cat jumps off the table and pads after him.",
+    "sent": "[calm, storytelling] The Tavern Keeper goes behind the counter. The cat jumps off the table and pads after him."
+  },
+  "5eee0d8de280": {
+    "speaker": "",
+    "expression": "",
+    "text": "He pours you a pint. It is warm and flat, but it is beer.",
+    "sent": "[calm, storytelling] He pours you a pint. It is warm and flat, but it is beer."
+  },
+  "2400c32abc94": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "Suit yourself.",
+    "sent": "[warm, tired, hearty] Suit yourself."
+  },
+  "85c59fc9cd7c": {
+    "speaker": "",
+    "expression": "",
+    "text": "You pat your pockets. Not a single coin.",
+    "sent": "[calm, storytelling] You pat your pockets. Not a single coin."
+  },
+  "f5948204685f": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "No coin, no beer. Not even for the harbour.",
+    "sent": "[warm, tired, hearty] No coin, no beer. Not even for the harbour."
+  },
+  "29e6cff01f61": {
+    "speaker": "Tavern Keeper",
+    "expression": "",
+    "text": "The barrel isn't going anywhere.",
+    "sent": "[warm, tired, hearty] The barrel isn't going anywhere."
+  }
+}

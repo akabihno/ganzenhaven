@@ -8,6 +8,27 @@ settings_sfx,Sound effects,Звуковые эффекты
 settings_voice,Voice-over,Озвучка
 voice_on_tip,Voice-over on (click to mute),"Озвучка включена (щёлкните, чтобы выключить)"
 voice_off_tip,Voice-over off (click to turn on),"Озвучка выключена (щёлкните, чтобы включить)"
+btn_inventory,Inventory,Инвентарь
+inventory_title,Inventory,Инвентарь
+inventory_empty,Nothing here yet.,Пока ничего нет.
+inventory_new,Picked up,Взято
+inventory_gone,No longer have,Больше нет
+inventory_hint,Click two things to use them together · click the table to put them away,"Щёлкните по двум вещам, чтобы применить их вместе · по столу — чтобы убрать"
+inventory_use_with,Now click something to use it with.,"Теперь щёлкните, с чем это применить."
+inventory_no_combine,These don't go together.,Это вместе не работает.
+purse,Purse,Кошелёк
+purse_empty,The purse is empty,Кошелёк пуст
+ledger_close_hint,Arrows turn the pages · Esc or a click on the table closes,Стрелки листают страницы · Esc или щелчок по столу — закрыть
+loc_inn,Inn,Постоялый двор
+char_captain,Captain Vos,Капитан Вос
+hs_scissors,Scissors,Ножницы
+hs_inn_ship_model,A ship model,Модель корабля
+hs_inn_charts,Sea charts,Морские карты
+hs_inn_stairs,Stairs to the rooms,Лестница к комнатам
+choice_done,That's all.,Это всё.
+new_game_confirm,"Start a new game? Your saved progress will be lost.","Начать новую игру? Сохранённый прогресс будет потерян."
+new_game_yes,Start anew,Начать заново
+new_game_no,Cancel,Отмена
 btn_map,Map,Карта
 btn_back,Back,Назад
 btn_menu,Menu,Меню

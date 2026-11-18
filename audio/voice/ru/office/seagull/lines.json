@@ -1,4 +1,34 @@
 {
+  "cf7a13e8ab3a": {
+    "speaker": "Чайка",
+    "expression": "",
+    "text": "Я перевариваю. Зайди позже.",
+    "sent": "[weary, sarcastic] Я перевариваю. Зайди позже."
+  },
+  "bfb90b3c4633": {
+    "speaker": "Чайка",
+    "expression": "tilt",
+    "text": "Это... рыба?",
+    "sent": "[curious, sceptical] Это... рыба?"
+  },
+  "8a94cab847e5": {
+    "speaker": "Чайка",
+    "expression": "",
+    "text": "Хм. Она на меня смотрит.",
+    "sent": "[weary, sarcastic] Хм. Она на меня смотрит."
+  },
+  "72b5517deb3e": {
+    "speaker": "Чайка",
+    "expression": "",
+    "text": "Вот и пусть.",
+    "sent": "[weary, sarcastic] Вот и пусть."
+  },
+  "c595b2bf911b": {
+    "speaker": "",
+    "expression": "",
+    "text": "Чайка в три глотка, с головы, проглатывает треску и выглядит почти благодарной.",
+    "sent": "[calm, storytelling] Чайка в три глотка, с головы, проглатывает треску и выглядит почти благодарной."
+  },
   "c479cb2fe817": {
     "speaker": "Чайка",
     "expression": "",

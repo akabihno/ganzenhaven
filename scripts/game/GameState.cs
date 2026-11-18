@@ -13,6 +13,9 @@ using System.Text.Json;
 /// <para>Also holds the journal: entries a script adds with <c>$journal id</c> and ticks off
 /// with <c>$journal done id</c>; their text lives in dialogs/&lt;language&gt;/journal.txt, where
 /// an indented entry is a step of the task above it (see <see cref="JournalText"/>).</para>
+/// <para>And the inventory: things the player carries, added with <c>$item id</c> and taken
+/// away with <c>$item remove id</c>; names and descriptions in dialogs/&lt;language&gt;/items.txt,
+/// pictures in assets/art/items (see <see cref="ItemText"/>).</para>
 /// <para>Saved as JSON in user://save.json; the language choice is kept separately in
 /// user://settings.cfg so it survives a new game.</para>
 /// </remarks>
@@ -33,6 +36,13 @@ public partial class GameState : Node
 	private readonly HashSet<string> _flags = new();
 	private readonly Dictionary<string, double> _vars = new();
 	private readonly List<JournalEntry> _journal = new();
+	private readonly List<string> _inventory = new();
+
+	/// <summary>An item was put into the inventory (<paramref name="added"/> true) or taken out.</summary>
+	[Signal] public delegate void InventoryUpdatedEventHandler(string id, bool added);
+
+	/// <summary>Item ids in the order they were picked up.</summary>
+	public IReadOnlyList<string> Inventory => _inventory;
 
 	public sealed record JournalEntry(string Id, bool Done);
 
@@ -80,7 +90,7 @@ public partial class GameState : Node
 	/// <summary>
 	/// Evaluates a condition as written in scripts and in the editor's ShowIf / HideIf
 	/// fields: <c>flag</c>, <c>!flag</c>, <c>name &gt;= 3</c>, <c>journal:id</c> (entry open),
-	/// <c>done:id</c> (entry ticked off), joined with <c>and</c> / <c>or</c>
+	/// <c>done:id</c> (entry ticked off), <c>item:id</c> (in the inventory), joined with <c>and</c> / <c>or</c>
 	/// (<c>and</c> binds tighter). An empty condition is true.
 	/// </summary>
 	public bool Check(string condition)
@@ -133,13 +143,36 @@ public partial class GameState : Node
 		bool negate = term.StartsWith('!');
 		string name = negate ? term[1..].Trim() : term;
 		bool result;
-		if (name.StartsWith("journal:"))
+		if (name.StartsWith("item:"))
+			result = _inventory.Contains(name[5..].Trim());
+		else if (name.StartsWith("journal:"))
 			result = _journal.Exists(e => e.Id == name[8..].Trim() && !e.Done);
 		else if (name.StartsWith("done:"))
 			result = _journal.Exists(e => e.Id == name[5..].Trim() && e.Done);
 		else
 			result = HasFlag(name);
 		return negate ? !result : result;
+	}
+
+	// ---------------------------------------------------------------- inventory
+
+	public bool HasItem(string id) => _inventory.Contains(id);
+
+	public void ItemAdd(string id)
+	{
+		if (string.IsNullOrEmpty(id) || _inventory.Contains(id))
+			return;
+		_inventory.Add(id);
+		EmitSignal(SignalName.InventoryUpdated, id, true);
+		EmitSignal(SignalName.Changed);
+	}
+
+	public void ItemRemove(string id)
+	{
+		if (!_inventory.Remove(id))
+			return;
+		EmitSignal(SignalName.InventoryUpdated, id, false);
+		EmitSignal(SignalName.Changed);
 	}
 
 	// ---------------------------------------------------------------- journal
@@ -209,17 +242,20 @@ public partial class GameState : Node
 		_flags.Clear();
 		_vars.Clear();
 		_journal.Clear();
+		_inventory.Clear();
 		Location = "office";
 		EmitSignal(SignalName.Changed);
 	}
 
 	public static bool HasSave => FileAccess.FileExists(SavePath);
 
-	private record SaveData(string Location, List<string> Flags, Dictionary<string, double> Vars, List<JournalEntry> Journal);
+	private record SaveData(string Location, List<string> Flags, Dictionary<string, double> Vars, List<JournalEntry> Journal,
+		List<string> Inventory);
 
 	public void Save()
 	{
-		var data = new SaveData(Location, new List<string>(_flags), new Dictionary<string, double>(_vars), new List<JournalEntry>(_journal));
+		var data = new SaveData(Location, new List<string>(_flags), new Dictionary<string, double>(_vars), new List<JournalEntry>(_journal),
+			new List<string>(_inventory));
 		using var file = FileAccess.Open(SavePath, FileAccess.ModeFlags.Write);
 		file?.StoreString(JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true }));
 	}
@@ -239,6 +275,8 @@ public partial class GameState : Node
 			_vars[k] = v;
 		_journal.Clear();
 		_journal.AddRange(data.Journal ?? new List<JournalEntry>());
+		_inventory.Clear();
+		_inventory.AddRange(data.Inventory ?? new List<string>());   // saves from before the inventory have none
 		Location = string.IsNullOrEmpty(data.Location) ? "office" : data.Location;
 		EmitSignal(SignalName.Changed);
 		return true;

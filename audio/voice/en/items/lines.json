@@ -1,0 +1,22 @@
+{
+  "cloth": {
+    "text": "Piece of cloth. A scrap of coarse burlap, torn off a thorn.",
+    "sent": "[calm, storytelling] Piece of cloth. A scrap of coarse burlap, torn off a thorn."
+  },
+  "scissors": {
+    "text": "Scissors. Iron scissors from the tavern table. The cat was keeping them warm.",
+    "sent": "[calm, storytelling] Scissors. Iron scissors from the tavern table. The cat was keeping them warm."
+  },
+  "blindfold": {
+    "text": "Blindfold. A strip of burlap, folded double. Nothing gets through.",
+    "sent": "[calm, storytelling] Blindfold. A strip of burlap, folded double. Nothing gets through."
+  },
+  "nets": {
+    "text": "Fisherman's nets. Hemp and cork. They smell of the tavern.",
+    "sent": "[calm, storytelling] Fisherman's nets. Hemp and cork. They smell of the tavern."
+  },
+  "fish": {
+    "text": "Cod. A fresh cod. It is looking at you.",
+    "sent": "[calm, storytelling] Cod. A fresh cod. It is looking at you."
+  }
+}

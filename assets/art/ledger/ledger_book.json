@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ee79-d22e-7667-b67e-bc530b7ec812",
+  "prompt": "Replace the small journal with a large open merchant's account ledger lying on the same table: two tall wide pages of thick cream paper ruled into columns with faint brown lines and a thin red margin line, the pages otherwise completely blank, a cloth ribbon bookmark, leather-bound corners. Keep the same dark oak table, inkwell, quill, warm candlelight and painted style, seen from directly above, the open book filling most of the frame.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/journal/journal_book.png"
+  ],
+  "consumed_credits": 6
+}

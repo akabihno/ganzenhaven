@@ -3,3 +3,7 @@
 # An indented entry is a step of the task above it, written under it in the journal.
 find_fish: Find fish
   fish_suspicious: Fish is suspicious
+  fisherman_nets: The Fisherman needs his nets back
+collect_debt: Collect two guldens owed for the Zwaluw
+  find_captain: Captain Vos is drinking at the Inn
+get_drink: Get a drink at the tavern

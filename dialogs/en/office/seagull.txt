@@ -2,6 +2,18 @@
 @show seagull
 @if tavern_keeper_dead
   Seagull: [placeholder — after the Tavern Keeper's death]
+@elif seagull_fed
+  Seagull: I am digesting. Come back later.
+@elif item:fish
+  Seagull [tilt]: Is that... fish?
+  * For you, madam.
+    $item remove fish
+    Seagull: Hm. It's looking at me.
+    Seagull: Good. Let it.
+    The seagull swallows the cod in three gulps, head first, and looks almost grateful.
+    $journal done find_fish
+    $set seagull_fed
+    # The next scene starts from the seagull_fed flag.
 @else
   Seagull: Here it is again, the same pitying head tilt
   * Wanna grab a bite?

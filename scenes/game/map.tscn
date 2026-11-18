@@ -73,3 +73,12 @@ offset_right = 1646
 offset_bottom = 566
 script = ExtResource("2_marker")
 LocationId = "bushes"
+
+[node name="Inn" type="Control" parent="."]
+offset_left = 1029
+offset_top = 609
+offset_right = 1121
+offset_bottom = 701
+script = ExtResource("2_marker")
+LocationId = "inn"
+ShowIf = "inn_known"

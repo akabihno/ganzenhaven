@@ -16,7 +16,10 @@ public sealed class DialogueScript
 	/// <summary><paramref name="Expression"/>: from "Name [expression]: text", for this line only.</summary>
 	public sealed record Say(int Line, string Speaker, string Text, string Expression = "") : Stmt(Line);
 	public sealed record Command(int Line, string Name, string[] Args, string Rest) : Stmt(Line);
-	public sealed record Option(string Text, string Condition, List<Stmt> Body);
+	/// <summary>A choice option. <paramref name="Leave"/>: picking it closes the menu for good
+	/// (written <c>@leave</c> after the option text); otherwise the menu comes back afterwards
+	/// without it.</summary>
+	public sealed record Option(string Text, string Condition, List<Stmt> Body, bool Leave = false);
 	public sealed record Choice(int Line, List<Option> Options) : Stmt(Line);
 	public sealed record Branch(string Condition, List<Stmt> Body);
 	public sealed record If(int Line, List<Branch> Branches, List<Stmt> Else) : Stmt(Line);
@@ -76,6 +79,14 @@ public sealed class DialogueScript
 
 	private readonly record struct SourceLine(int Number, int Indent, string Text);
 
+	private static string StripLeave(string text, ref bool leave)
+	{
+		if (text != "@leave" && !text.EndsWith(" @leave", System.StringComparison.Ordinal))
+			return text;
+		leave = true;
+		return text[..^"@leave".Length].Trim();
+	}
+
 	// "Name: text" or "Name [expression]: text". The name may not hold sentence punctuation, so
 	// "Note: ..." style narration can still be forced with a leading backslash.
 	private static readonly Regex SpeakerLine = new(@"^(?<name>[^\s:@$*\\#\[][^:.!?""«»\[]{0,40}?)(\s*\[(?<expr>[\w-]+)\])?:\s+(?<text>.+)$");
@@ -132,8 +143,12 @@ public sealed class DialogueScript
 						condition = optionText[(at + 5)..].Trim();
 						optionText = optionText[..at].Trim();
 					}
+					// "@leave" may come before or after "@if condition".
+					bool leave = false;
+					optionText = StripLeave(optionText, ref leave);
+					condition = StripLeave(condition, ref leave);
 					pos++;
-					options.Add(new Option(optionText, condition, ChildBlock(lines, ref pos, indent, path)));
+					options.Add(new Option(optionText, condition, ChildBlock(lines, ref pos, indent, path), leave));
 				}
 				block.Add(new Choice(line.Number, options));
 				continue;

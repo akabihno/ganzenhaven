@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
 [ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
 [ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+[ext_resource type="Texture2D" path="res://assets/art/props/bushes_cloth.png" id="4_cloth"]
 
 [node name="Bushes" type="Control"]
 layout_mode = 3
@@ -35,13 +36,15 @@ LabelKey = "hs_town"
 Dialogue = "bushes/town"
 
 [node name="Cloth" type="Control" parent="."]
-offset_left = 550
-offset_top = 630
-offset_right = 820
-offset_bottom = 910
+offset_left = 551
+offset_top = 638
+offset_right = 815
+offset_bottom = 917
 script = ExtResource("3_hot")
 LabelKey = "hs_cloth"
 Dialogue = "bushes/cloth"
+Picture = ExtResource("4_cloth")
+HideIf = "item:cloth"
 
 [node name="Thicket" type="Control" parent="."]
 offset_left = 1520

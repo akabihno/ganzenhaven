@@ -1,5 +1,28 @@
-# PLACEHOLDER — replace with your dialogue.
 # He is only in the tavern before his death (TavernKeeper spot: HideIf = "tavern_keeper_dead").
 # His death itself is yours to script: somewhere, "$set tavern_keeper_dead" starts the second act.
+# A pint cost a stuiver or so (20 stuivers to the gulden); he charges the harbour two.
 @show tavern_keeper
-Tavern Keeper: [placeholder]
+@if keeper_at_counter
+  Tavern Keeper: Another pint, Harbourmaster? Same price as the first.
+@else
+  Tavern Keeper: Harbourmaster! Can I get you anything to drink?
+  * A pint would be welcome.  @leave
+    Tavern Keeper: Two stuivers, then. That's the harbour price.
+    @if stuivers >= 2
+      * Pay two stuivers.  @leave
+        $add stuivers -2
+        Tavern Keeper: Coming right up.
+        @hide tavern_keeper
+        $set keeper_at_counter
+        $set cat_on_counter
+        The Tavern Keeper goes behind the counter. The cat jumps off the table and pads after him.
+        He pours you a pint. It is warm and flat, but it is beer.
+        $journal done get_drink
+      * On second thought, no.  @leave
+        Tavern Keeper: Suit yourself.
+    @else
+      You pat your pockets. Not a single coin.
+      Tavern Keeper: No coin, no beer. Not even for the harbour.
+      $journal get_drink
+  * Not now, thanks.  @leave
+    Tavern Keeper: The barrel isn't going anywhere.

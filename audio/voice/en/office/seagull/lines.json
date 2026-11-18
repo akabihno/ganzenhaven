@@ -1,4 +1,34 @@
 {
+  "c667ac9b18e8": {
+    "speaker": "Seagull",
+    "expression": "",
+    "text": "I am digesting. Come back later.",
+    "sent": "[weary, sarcastic] I am digesting. Come back later."
+  },
+  "cbd2514b429b": {
+    "speaker": "Seagull",
+    "expression": "tilt",
+    "text": "Is that... fish?",
+    "sent": "[curious, sceptical] Is that... fish?"
+  },
+  "83c5dabe5b1d": {
+    "speaker": "Seagull",
+    "expression": "",
+    "text": "Hm. It's looking at me.",
+    "sent": "[weary, sarcastic] Hm. It's looking at me."
+  },
+  "72ad445b8f25": {
+    "speaker": "Seagull",
+    "expression": "",
+    "text": "Good. Let it.",
+    "sent": "[weary, sarcastic] Good. Let it."
+  },
+  "d866e043a34d": {
+    "speaker": "",
+    "expression": "",
+    "text": "The seagull swallows the cod in three gulps, head first, and looks almost grateful.",
+    "sent": "[calm, storytelling] The seagull swallows the cod in three gulps, head first, and looks almost grateful."
+  },
   "4837223df4b8": {
     "speaker": "Seagull",
     "expression": "",

@@ -3,6 +3,9 @@
 [ext_resource type="Script" path="res://scripts/game/LocationScreen.cs" id="1_loc"]
 [ext_resource type="Script" path="res://scripts/game/CharacterSpot.cs" id="2_spot"]
 [ext_resource type="Script" path="res://scripts/game/Hotspot.cs" id="3_hot"]
+[ext_resource type="Texture2D" path="res://assets/art/backgrounds/tavern_counter_front.png" id="4_front"]
+[ext_resource type="Texture2D" path="res://assets/art/props/tavern_scissors.png" id="5_scissors"]
+[ext_resource type="Texture2D" path="res://assets/art/props/tavern_nets.png" id="6_nets"]
 
 [node name="Tavern" type="Control"]
 layout_mode = 3
@@ -35,13 +38,15 @@ LabelKey = "hs_barrels"
 Dialogue = "tavern/barrels"
 
 [node name="Nets" type="Control" parent="."]
-offset_left = 800
-offset_top = 360
-offset_right = 1130
-offset_bottom = 560
+offset_left = 780
+offset_top = 316
+offset_right = 1118
+offset_bottom = 577
 script = ExtResource("3_hot")
 LabelKey = "hs_nets"
 Dialogue = "tavern/nets"
+Picture = ExtResource("6_nets")
+HideIf = "nets_taken"
 
 [node name="Lantern" type="Control" parent="."]
 offset_left = 1160
@@ -80,7 +85,7 @@ script = ExtResource("2_spot")
 CharacterId = "tavern_keeper"
 Dialogue = "tavern/tavern_keeper"
 Height = 620.0
-HideIf = "tavern_keeper_dead"
+HideIf = "tavern_keeper_dead or keeper_at_counter"
 
 [node name="BlackCat" type="Control" parent="."]
 offset_left = 844
@@ -91,4 +96,52 @@ script = ExtResource("2_spot")
 CharacterId = "black_cat"
 Dialogue = "tavern/black_cat"
 Height = 190.0
+HideIf = "tavern_keeper_dead or cat_on_counter"
+
+[node name="Scissors" type="Control" parent="."]
+offset_left = 822
+offset_top = 694
+offset_right = 972
+offset_bottom = 768
+script = ExtResource("3_hot")
+LabelKey = "hs_scissors"
+Dialogue = "tavern/scissors"
+Picture = ExtResource("5_scissors")
+ShowIf = "cat_on_counter"
+HideIf = "item:scissors"
+
+[node name="KeeperAtCounter" type="Control" parent="."]
+offset_left = 370
+offset_top = 250
+offset_right = 598
+offset_bottom = 790
+script = ExtResource("2_spot")
+CharacterId = "tavern_keeper"
+Dialogue = "tavern/tavern_keeper"
+Height = 540.0
+ShowIf = "keeper_at_counter"
+HideIf = "tavern_keeper_dead"
+
+[node name="CounterFront" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("4_front")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="CatOnCounter" type="Control" parent="."]
+offset_left = 650
+offset_top = 425
+offset_right = 756
+offset_bottom = 590
+script = ExtResource("2_spot")
+CharacterId = "black_cat"
+Dialogue = "tavern/black_cat"
+Height = 165.0
+ShowIf = "cat_on_counter"
 HideIf = "tavern_keeper_dead"

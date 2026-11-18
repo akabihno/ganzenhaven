@@ -1,0 +1,13 @@
+# Inventory items: "id: name", with an optional description indented under it.
+# Scripts give an item with "$item id" and take it with "$item remove id"; condition "item:id".
+# Picture: assets/art/items/<id>.png
+cloth: Piece of cloth
+  A scrap of coarse burlap, torn off a thorn.
+scissors: Scissors
+  Iron scissors from the tavern table. The cat was keeping them warm.
+blindfold: Blindfold
+  A strip of burlap, folded double. Nothing gets through.
+nets: Fisherman's nets
+  Hemp and cork. They smell of the tavern.
+fish: Cod
+  A fresh cod. It is looking at you.

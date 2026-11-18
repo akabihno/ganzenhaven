@@ -2,6 +2,7 @@ using Godot;
 
 /// <summary>
 /// Title screen: New game, Continue, language (English / Русский), Settings, Quit.
+/// New game asks first when there is a saved game it would overwrite.
 /// Settings opens a panel beside the buttons with the music and sound-effect volumes and the
 /// voice-over switch (see <see cref="Settings"/>).
 /// </summary>
@@ -35,6 +36,12 @@ public partial class MainMenu : Control
 
 	public override void _UnhandledInput(InputEvent e)
 	{
+		if (_confirm != null && e.IsActionPressed("ui_cancel"))
+		{
+			CloseConfirm();
+			GetViewport().SetInputAsHandled();
+			return;
+		}
 		if (_settingsOpen && e.IsActionPressed("ui_cancel"))
 		{
 			_settingsOpen = false;
@@ -58,7 +65,13 @@ public partial class MainMenu : Control
 		_buttons.OffsetBottom = 400;
 		AddChild(_buttons);
 
-		Add(Tr("menu_new"), () => Game.Instance.NewGame());
+		Add(Tr("menu_new"), () =>
+		{
+			if (GameState.HasSave)
+				ConfirmNewGame();
+			else
+				Game.Instance.NewGame();
+		});
 		var cont = Add(Tr("menu_continue"), () => Game.Instance.ContinueGame());
 		cont.Disabled = !GameState.HasSave;
 
@@ -99,6 +112,73 @@ public partial class MainMenu : Control
 		b.Pressed += action;
 		_buttons.AddChild(b);
 		return b;
+	}
+
+	// ---------------------------------------------------------------- new game warning
+
+	private Control _confirm;
+
+	/// <summary>"Start a new game? Your saved progress will be lost." over a dimmed menu.</summary>
+	private void ConfirmNewGame()
+	{
+		CloseConfirm();
+		_confirm = new ColorRect { Color = new Color(0, 0, 0, 0.6f), MouseFilter = MouseFilterEnum.Stop };
+		_confirm.SetAnchorsPreset(LayoutPreset.FullRect);
+		AddChild(_confirm);
+
+		var panel = new PanelContainer();
+		panel.SetAnchorsPreset(LayoutPreset.Center);
+		panel.OffsetLeft = -460;
+		panel.OffsetRight = 460;
+		panel.OffsetTop = -150;
+		panel.OffsetBottom = 150;
+		panel.GrowHorizontal = GrowDirection.Both;
+		panel.GrowVertical = GrowDirection.Both;
+		panel.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+		{
+			BgColor = new Color(0.07f, 0.055f, 0.045f, 0.96f),
+			BorderColor = new Color(0.93f, 0.78f, 0.48f, 0.9f),
+			BorderWidthTop = 2, BorderWidthBottom = 2, BorderWidthLeft = 2, BorderWidthRight = 2,
+			CornerRadiusTopLeft = 6, CornerRadiusTopRight = 6, CornerRadiusBottomLeft = 6, CornerRadiusBottomRight = 6,
+			ContentMarginLeft = 48, ContentMarginRight = 48, ContentMarginTop = 36, ContentMarginBottom = 36,
+		});
+		_confirm.AddChild(panel);
+
+		var column = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
+		column.AddThemeConstantOverride("separation", 36);
+		panel.AddChild(column);
+
+		var question = new Label
+		{
+			Text = Tr("new_game_confirm"),
+			HorizontalAlignment = HorizontalAlignment.Center,
+			AutowrapMode = TextServer.AutowrapMode.WordSmart,
+			CustomMinimumSize = new Vector2(820, 0),
+		};
+		question.AddThemeFontSizeOverride("font_size", 38);
+		column.AddChild(question);
+
+		var buttons = new HBoxContainer { Alignment = BoxContainer.AlignmentMode.Center };
+		buttons.AddThemeConstantOverride("separation", 28);
+		column.AddChild(buttons);
+		Button Choice(string text, System.Action action)
+		{
+			var b = new Button { Text = text, CustomMinimumSize = new Vector2(300, 68) };
+			b.AddThemeFontSizeOverride("font_size", 34);
+			b.Pressed += action;
+			buttons.AddChild(b);
+			return b;
+		}
+		Choice(Tr("new_game_yes"), () => Game.Instance.NewGame());
+		// The safe answer has the focus, so a stray Enter doesn't wipe the save.
+		Choice(Tr("new_game_no"), CloseConfirm).CallDeferred(Control.MethodName.GrabFocus);
+	}
+
+	private void CloseConfirm()
+	{
+		_confirm?.QueueFree();
+		_confirm = null;
+		((Control)_buttons.GetChild(0)).CallDeferred(Control.MethodName.GrabFocus);
 	}
 
 	// ---------------------------------------------------------------- settings panel
