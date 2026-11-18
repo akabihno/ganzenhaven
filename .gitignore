@@ -32,3 +32,4 @@ translations/*.translation
 
 # Generation logs from tools/elevenlabs_*.py
 audio/**/*.log
+__pycache__/

@@ -1,3 +1,5 @@
 # Journal entries: "id: text". Scripts add them with "$journal id",
 # tick them off with "$journal done id". Conditions: "journal:id" (open), "done:id" (finished).
+# An indented entry is a step of the task above it, written under it in the journal.
 find_fish: Find fish
+  fish_suspicious: Fish is suspicious

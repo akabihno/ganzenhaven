@@ -8,7 +8,8 @@ using System.Collections.Generic;
 /// </summary>
 /// <remarks>
 /// Click, Space or Enter advances; mid-line it reveals the whole line first. Text may use
-/// BBCode ([i]…[/i], [b]…[/b], [color=…]).
+/// BBCode ([i]…[/i], [b]…[/b], [color=…]). The speaker in the top-right corner of the box
+/// switches the voice-over off and on (<see cref="Settings.VoiceOn"/>).
 /// </remarks>
 public partial class DialogueBox : CanvasLayer
 {
@@ -30,8 +31,9 @@ public partial class DialogueBox : CanvasLayer
 	private bool _busy;          // a wait / cutscene is in progress
 	private float _blink;
 	private Action<string, string[]> _onGameCommand;
-	private string _lineExpressionId = "";
-	private AudioStreamPlayer _voice;   // whose sprite a "Name [expression]:" line changed
+	private string _lineExpressionId = "";   // whose sprite a "Name [expression]:" line changed
+	private AudioStreamPlayer _voice;
+	private string _lineVoice = "";     // the recording for the line on screen
 
 	public override void _Ready()
 	{
@@ -40,6 +42,7 @@ public partial class DialogueBox : CanvasLayer
 		_voice = new AudioStreamPlayer { Bus = "Voice" };
 		_voice.Finished += () => Game.Instance.Music.Duck(false);
 		AddChild(_voice);
+		Settings.Changed += OnSettingsChanged;
 		Hide();
 	}
 
@@ -83,6 +86,7 @@ public partial class DialogueBox : CanvasLayer
 	private void Advance()
 	{
 		StopVoice();
+		_lineVoice = "";
 		ClearChoices();
 		while (_runner != null && !_busy)
 		{
@@ -92,7 +96,8 @@ public partial class DialogueBox : CanvasLayer
 				case DialogueRunner.SayEvent say:
 					ApplyLineExpression(say.Speaker, say.Expression);
 					ShowLine(say.Speaker, say.Text);
-					PlayVoice(say.VoicePath);
+					_lineVoice = say.VoicePath;
+					PlayVoice(_lineVoice);
 					return;
 
 				case DialogueRunner.ChoiceEvent choice:
@@ -228,7 +233,7 @@ public partial class DialogueBox : CanvasLayer
 	private void PlayVoice(string path)
 	{
 		StopVoice();
-		if (string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
+		if (!Settings.VoiceOn || string.IsNullOrEmpty(path) || !ResourceLoader.Exists(path))
 			return;
 		using (var stream = GD.Load<AudioStream>(path))
 			_voice.Stream = stream;
@@ -236,7 +241,20 @@ public partial class DialogueBox : CanvasLayer
 		Game.Instance.Music.Duck(true);
 	}
 
-	public override void _ExitTree() => ReleaseAudio();
+	/// <summary>Voice switched off: silence now. Switched on: say the line on screen.</summary>
+	private void OnSettingsChanged()
+	{
+		if (!Settings.VoiceOn)
+			StopVoice();
+		else if (!_voice.Playing && _runner != null && _panel.Visible && !_choices.Visible)
+			PlayVoice(_lineVoice);
+	}
+
+	public override void _ExitTree()
+	{
+		Settings.Changed -= OnSettingsChanged;
+		ReleaseAudio();
+	}
 
 	/// <summary>Stops the voice and lets go of its stream (before quitting).</summary>
 	public void ReleaseAudio()
@@ -375,6 +393,17 @@ public partial class DialogueBox : CanvasLayer
 		_more.AddThemeFontSizeOverride("font_size", 26);
 		_more.AddThemeColorOverride("font_color", new Color(0.93f, 0.78f, 0.48f));
 		_panel.AddChild(_more);
+
+		// Voice on / off, in the panel's top-right corner. A button takes the click, so
+		// pressing it doesn't also advance the dialogue.
+		var voice = new VoiceToggle();
+		voice.SetAnchorsPreset(Control.LayoutPreset.BottomRight);
+		voice.OffsetLeft = -120 - 12 - 60;
+		voice.OffsetRight = -120 - 12;
+		voice.OffsetTop = -300 + 10;
+		voice.OffsetBottom = -300 + 10 + 60;
+		_root.AddChild(voice);
+		_panel.VisibilityChanged += () => voice.Visible = _panel.Visible;
 
 		// Choices stack upward from just above the text panel, so the line they answer stays readable.
 		_choices = new VBoxContainer { Alignment = BoxContainer.AlignmentMode.End };

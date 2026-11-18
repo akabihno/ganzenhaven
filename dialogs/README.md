@@ -76,6 +76,22 @@ $journal remove find_fish
 The text of each entry lives in `dialogs/en/journal.txt` and `dialogs/ru/journal.txt`, one
 `id: text` per line, so the journal follows the language setting.
 
+An indented entry is a **step** of the task above it. Steps are added and ticked off like any
+entry, but the journal writes them under their task, and they move to the "done" page with it:
+
+```
+find_fish: Find fish
+  fish_suspicious: Fish is suspicious
+```
+
+```
+@if journal:find_fish and fish_required
+  $journal fish_suspicious     shows up under "Find fish"
+```
+
+Add a step only while its task is open (check `journal:<task>`); a step whose task isn't in the
+journal is written as a task of its own. `$journal remove <task>` removes its steps too.
+
 ## The two acts
 
 **`tavern_keeper_dead`** is the one flag the game itself knows: setting it starts the second

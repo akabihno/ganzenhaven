@@ -1,14 +1,24 @@
 using Godot;
 
-/// <summary>Title screen: New game, Continue, language (English / Русский), Quit.</summary>
+/// <summary>
+/// Title screen: New game, Continue, language (English / Русский), Settings, Quit.
+/// Settings opens a panel beside the buttons with the music and sound-effect volumes and the
+/// voice-over switch (see <see cref="Settings"/>).
+/// </summary>
 [GlobalClass]
 public partial class MainMenu : Control
 {
 	private VBoxContainer _buttons;
+	private PanelContainer _settings;
+	private bool _settingsOpen;
+	private Button _settingsButton;
+	private AudioStreamPlayer _sfxPreview;
 
 	public override void _Ready()
 	{
 		SetAnchorsPreset(LayoutPreset.FullRect);
+		_sfxPreview = new AudioStreamPlayer { Bus = "Sfx", Stream = GD.Load<AudioStream>("res://audio/sfx/gull_indignant.ogg") };
+		AddChild(_sfxPreview);
 		Build();
 		Game.Instance.Music.Play("map");
 		GameState.Instance.LanguageChanged += OnLanguageChanged;
@@ -18,6 +28,20 @@ public partial class MainMenu : Control
 	{
 		if (GameState.Instance != null)
 			GameState.Instance.LanguageChanged -= OnLanguageChanged;
+		_sfxPreview.Stop();
+		_sfxPreview.Stream = null;
+		Settings.Save();   // slider moves made with the keyboard aren't saved as they happen
+	}
+
+	public override void _UnhandledInput(InputEvent e)
+	{
+		if (_settingsOpen && e.IsActionPressed("ui_cancel"))
+		{
+			_settingsOpen = false;
+			_settings.Hide();
+			_settingsButton.SetPressedNoSignal(false);
+			GetViewport().SetInputAsHandled();
+		}
 	}
 
 	private void OnLanguageChanged(string language) => Build();
@@ -30,8 +54,8 @@ public partial class MainMenu : Control
 		_buttons.SetAnchorsPreset(LayoutPreset.CenterLeft);
 		_buttons.OffsetLeft = 160;
 		_buttons.OffsetRight = 640;
-		_buttons.OffsetTop = -120;
-		_buttons.OffsetBottom = 360;
+		_buttons.OffsetTop = -160;
+		_buttons.OffsetBottom = 400;
 		AddChild(_buttons);
 
 		Add(Tr("menu_new"), () => Game.Instance.NewGame());
@@ -54,8 +78,18 @@ public partial class MainMenu : Control
 		}
 		_buttons.AddChild(langs);
 
+		_settingsButton = Add(Tr("menu_settings"), () =>
+		{
+			_settingsOpen = !_settingsOpen;
+			_settings.Visible = _settingsOpen;
+		});
+		_settingsButton.ToggleMode = true;
+		_settingsButton.SetPressedNoSignal(_settingsOpen);
+
 		Add(Tr("menu_quit"), () => Game.Instance.Quit());
 		((Control)_buttons.GetChild(0)).CallDeferred(Control.MethodName.GrabFocus);
+
+		BuildSettings();
 	}
 
 	private Button Add(string text, System.Action action)
@@ -65,5 +99,64 @@ public partial class MainMenu : Control
 		b.Pressed += action;
 		_buttons.AddChild(b);
 		return b;
+	}
+
+	// ---------------------------------------------------------------- settings panel
+
+	private void BuildSettings()
+	{
+		_settings?.QueueFree();
+		_settings = new PanelContainer { Visible = _settingsOpen };
+		_settings.SetAnchorsPreset(LayoutPreset.CenterLeft);
+		_settings.OffsetLeft = 700;
+		_settings.OffsetRight = 1240;
+		_settings.OffsetTop = -40;
+		_settings.OffsetBottom = 300;
+		_settings.AddThemeStyleboxOverride("panel", new StyleBoxFlat
+		{
+			BgColor = new Color(0.07f, 0.055f, 0.045f, 0.88f),
+			BorderColor = new Color(0.62f, 0.5f, 0.3f, 0.9f),
+			BorderWidthTop = 2, BorderWidthBottom = 2, BorderWidthLeft = 2, BorderWidthRight = 2,
+			CornerRadiusTopLeft = 6, CornerRadiusTopRight = 6, CornerRadiusBottomLeft = 6, CornerRadiusBottomRight = 6,
+			ContentMarginLeft = 36, ContentMarginRight = 36, ContentMarginTop = 24, ContentMarginBottom = 28,
+		});
+		AddChild(_settings);
+
+		var column = new VBoxContainer();
+		column.AddThemeConstantOverride("separation", 10);
+		_settings.AddChild(column);
+
+		VolumeRow(column, Tr("settings_music"), Settings.MusicVolume,
+			v => Settings.SetMusicVolume(v, save: false), null);
+		VolumeRow(column, Tr("settings_sfx"), Settings.SfxVolume,
+			v => Settings.SetSfxVolume(v, save: false), () => _sfxPreview.Play());
+
+		column.AddChild(new Control { CustomMinimumSize = new Vector2(0, 8) });
+		var voice = new CheckButton { Text = Tr("settings_voice"), ButtonPressed = Settings.VoiceOn };
+		voice.AddThemeFontSizeOverride("font_size", 34);
+		voice.Toggled += Settings.SetVoiceOn;
+		column.AddChild(voice);
+	}
+
+	private static void VolumeRow(VBoxContainer column, string label, float value,
+		System.Action<float> onChange, System.Action onRelease)
+	{
+		var title = new Label { Text = label };
+		title.AddThemeFontSizeOverride("font_size", 32);
+		column.AddChild(title);
+
+		var slider = new HSlider
+		{
+			MinValue = 0, MaxValue = 1, Step = 0.01, Value = value,
+			CustomMinimumSize = new Vector2(0, 40),
+		};
+		slider.ValueChanged += v => onChange((float)v);
+		// Saved (and, for sound effects, heard) once the slider is let go.
+		slider.DragEnded += _ =>
+		{
+			Settings.Save();
+			onRelease?.Invoke();
+		};
+		column.AddChild(slider);
 	}
 }

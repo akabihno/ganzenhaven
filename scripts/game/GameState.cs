@@ -11,7 +11,8 @@ using System.Text.Json;
 /// <c>@if</c>. The game is split in two acts by one flag, <see cref="TavernKeeperDead"/>:
 /// before it people behave more or less sanely, after it the harbour comes apart.</para>
 /// <para>Also holds the journal: entries a script adds with <c>$journal id</c> and ticks off
-/// with <c>$journal done id</c>; their text lives in dialogs/&lt;language&gt;/journal.txt.</para>
+/// with <c>$journal done id</c>; their text lives in dialogs/&lt;language&gt;/journal.txt, where
+/// an indented entry is a step of the task above it (see <see cref="JournalText"/>).</para>
 /// <para>Saved as JSON in user://save.json; the language choice is kept separately in
 /// user://settings.cfg so it survives a new game.</para>
 /// </remarks>
@@ -166,9 +167,11 @@ public partial class GameState : Node
 		EmitSignal(SignalName.Changed);
 	}
 
+	/// <summary>Takes an entry out of the journal, with any steps written under it.</summary>
 	public void JournalRemove(string id)
 	{
-		if (_journal.RemoveAll(e => e.Id == id) > 0)
+		var steps = new HashSet<string>(JournalText.Steps(id, Language));
+		if (_journal.RemoveAll(e => e.Id == id || steps.Contains(e.Id)) > 0)
 			EmitSignal(SignalName.Changed);
 	}
 

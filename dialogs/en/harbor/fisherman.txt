@@ -1,10 +1,10 @@
-# Example of the format (choices, flags, the act split). Rewrite freely.
 @show fisherman
 Fisherman: Harbourmaster! The fish are looking at me.
 * Looking how?
   Fisherman: Judgementally.
 * Fish don't look.
   Fisherman: These ones do.
-  $set fish_suspicious
+  @if journal:find_fish and fish_required
+    $journal fish_suspicious
 @if tavern_keeper_dead
   Fisherman: ...and now they whisper.

@@ -194,7 +194,34 @@ public partial class GameHud : CanvasLayer
 	private void FillJournal()
 	{
 		var state = GameState.Instance;
+		string lang = state.Language;
 		_closeHint.Text = Tr("journal_close_hint");
+
+		// Tasks are written with their steps under them. A step whose task isn't in the
+		// journal is written as a task of its own.
+		bool InJournal(string id) => id.Length > 0 && FindEntry(id) != null;
+		bool IsTask(GameState.JournalEntry e) => !InJournal(JournalText.Parent(e.Id, lang));
+
+		void WriteTask(System.Text.StringBuilder page, GameState.JournalEntry task, bool crossed)
+		{
+			string text = JournalText.Get(task.Id, lang);
+			if (crossed)
+				page.Append($"[color=#{FadedInk.ToHtml()}][s]").Append(text).Append("[/s][/color]\n");
+			else
+				page.Append("~ ").Append(text).Append('\n');
+			foreach (var step in state.Journal)
+			{
+				if (JournalText.Parent(step.Id, lang) != task.Id)
+					continue;
+				page.Append("[font_size=38]      ");
+				string stepText = JournalText.Get(step.Id, lang);
+				if (crossed || step.Done)
+					page.Append($"[color=#{FadedInk.ToHtml()}][s]").Append(stepText).Append("[/s][/color]");
+				else
+					page.Append("– ").Append(stepText);
+				page.Append("[/font_size]\n");
+			}
+		}
 
 		// Left page: the heading and what still needs doing, newest first.
 		var left = new System.Text.StringBuilder();
@@ -202,28 +229,36 @@ public partial class GameHud : CanvasLayer
 		bool any = false;
 		for (int i = state.Journal.Count - 1; i >= 0; i--)
 		{
-			if (state.Journal[i].Done)
+			var entry = state.Journal[i];
+			if (entry.Done || !IsTask(entry))
 				continue;
-			left.Append("~ ").Append(JournalText.Get(state.Journal[i].Id, state.Language)).Append('\n');
+			WriteTask(left, entry, false);
 			any = true;
 		}
 		if (!any)
 			left.Append($"[color=#{FadedInk.ToHtml()}]").Append(Tr("journal_empty")).Append("[/color]");
 		_journalText.Text = left.ToString();
 
-		// Right page: what's been done, crossed out.
+		// Right page: what's been done, crossed out, steps and all.
 		var right = new System.Text.StringBuilder();
 		for (int i = state.Journal.Count - 1; i >= 0; i--)
 		{
-			if (!state.Journal[i].Done)
+			var entry = state.Journal[i];
+			if (!entry.Done || !IsTask(entry))
 				continue;
 			if (right.Length == 0)
 				right.Append("[font_size=52]").Append(Tr("journal_done_heading")).Append("[/font_size]\n\n");
-			right.Append($"[color=#{FadedInk.ToHtml()}][s]")
-				.Append(JournalText.Get(state.Journal[i].Id, state.Language))
-				.Append("[/s][/color]\n");
+			WriteTask(right, entry, true);
 		}
 		_rightPage.Text = right.ToString();
+	}
+
+	private static GameState.JournalEntry FindEntry(string id)
+	{
+		foreach (var e in GameState.Instance.Journal)
+			if (e.Id == id)
+				return e;
+		return null;
 	}
 
 	// ---------------------------------------------------------------- notice
@@ -236,6 +271,7 @@ public partial class GameHud : CanvasLayer
 		_toast.OffsetRight = 420;
 		_toast.OffsetTop = 120;
 		_toast.OffsetBottom = 200;
+		_toast.GrowHorizontal = Control.GrowDirection.Both;   // longer notices widen evenly
 		_toast.AddThemeStyleboxOverride("panel", new StyleBoxFlat
 		{
 			BgColor = new Color(0.07f, 0.055f, 0.045f, 0.88f),
@@ -253,7 +289,12 @@ public partial class GameHud : CanvasLayer
 
 	private void OnJournalUpdated(string id, bool done)
 	{
-		string entry = JournalText.Get(id, GameState.Instance.Language);
+		string lang = GameState.Instance.Language;
+		string entry = JournalText.Get(id, lang);
+		// A step is announced with the task it belongs to.
+		string task = JournalText.Parent(id, lang);
+		if (task.Length > 0 && FindEntry(task) != null)
+			entry = $"{JournalText.Get(task, lang)} — {entry}";
 		_toastText.Text = $"{Tr(done ? "journal_done" : "journal_new")}: {entry}";
 		_toastTween?.Kill();
 		_toast.Modulate = new Color(1, 1, 1, 0);

@@ -49,6 +49,7 @@ public partial class Game : Node
 		ProcessMode = ProcessModeEnum.Always;
 		// Closing the window goes through Quit() so audio is released first.
 		GetTree().AutoAcceptQuit = false;
+		Settings.Load();
 		UiTheme = BuildTheme();
 		GetTree().Root.Theme = UiTheme;
 
@@ -314,6 +315,26 @@ public partial class Game : Node
 		theme.SetColor("font_focus_color", "Button", gold);
 		theme.SetColor("font_pressed_color", "Button", gold);
 		theme.SetColor("font_disabled_color", "Button", new Color(0.5f, 0.46f, 0.4f));
+		// Sliders: a dark groove that fills with gold up to the grabber.
+		StyleBoxFlat Groove(Color fill) => new()
+		{
+			BgColor = fill,
+			BorderColor = new Color(0.55f, 0.44f, 0.27f, 0.8f),
+			BorderWidthTop = 1, BorderWidthBottom = 1, BorderWidthLeft = 1, BorderWidthRight = 1,
+			CornerRadiusTopLeft = 4, CornerRadiusTopRight = 4, CornerRadiusBottomLeft = 4, CornerRadiusBottomRight = 4,
+			ContentMarginTop = 5, ContentMarginBottom = 5,
+		};
+		theme.SetStylebox("slider", "HSlider", Groove(new Color(0.08f, 0.06f, 0.05f, 0.9f)));
+		theme.SetStylebox("grabber_area", "HSlider", Groove(new Color(0.75f, 0.6f, 0.34f)));
+		theme.SetStylebox("grabber_area_highlight", "HSlider", Groove(gold));
+		foreach (var type in new[] { "CheckButton", "CheckBox" })
+		{
+			theme.SetColor("font_color", type, ink);
+			theme.SetColor("font_hover_color", type, gold);
+			theme.SetColor("font_focus_color", type, gold);
+			theme.SetColor("font_pressed_color", type, ink);
+			theme.SetColor("font_hover_pressed_color", type, gold);
+		}
 		theme.SetColor("font_color", "Label", ink);
 		theme.SetColor("font_shadow_color", "Label", new Color(0, 0, 0, 0.8f));
 		theme.SetConstant("shadow_offset_x", "Label", 2);

@@ -2,6 +2,12 @@ keys,en,ru
 menu_new,New game,Новая игра
 menu_continue,Continue,Продолжить
 menu_quit,Quit,Выход
+menu_settings,Settings,Настройки
+settings_music,Music,Музыка
+settings_sfx,Sound effects,Звуковые эффекты
+settings_voice,Voice-over,Озвучка
+voice_on_tip,Voice-over on (click to mute),"Озвучка включена (щёлкните, чтобы выключить)"
+voice_off_tip,Voice-over off (click to turn on),"Озвучка выключена (щёлкните, чтобы включить)"
 btn_map,Map,Карта
 btn_back,Back,Назад
 btn_menu,Menu,Меню
