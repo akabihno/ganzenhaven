@@ -1,0 +1,11 @@
+{
+  "task_id": "01a1ef7c-4e78-722e-9ba7-579d10856674",
+  "prompt": "Photorealistic cinematic 35mm film still in exactly the look of the reference night graveyard: 17th-century Dutch harbour town at night, cold blue moonlight, thin sea fog, warm orange lantern light, muted desaturated colours, soft film grain. The hooded gravedigger of the second reference alone in this graveyard at night, shovelling wet earth into a filled-in grave beside a mound of earth, a lantern standing on an old gravestone next to him, and far behind him a line of small lantern lights going away down the hill into the fog toward the town, the dark church behind. Medium-wide shot, he is seen from the side, mid-swing.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/graveyard_after.png",
+    "assets/art/characters/gravedigger.png"
+  ],
+  "consumed_credits": 6
+}

@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ef87-ddec-760f-9274-4a3a3e53dffc",
+  "prompt": "Exactly the same image, same framing and lighting, but the belfry arch at the top of the tower is empty: no bell, only the moonlit cloudy sky seen through the open arch. Change nothing else.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/cutscenes/funeral/bell.png"
+  ],
+  "consumed_credits": 6
+}

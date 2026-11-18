@@ -1,0 +1,10 @@
+{
+  "task_id": "01a1ef7c-4e8c-7529-9d81-71abd5ed6126",
+  "prompt": "Photorealistic cinematic 35mm film still in exactly the look of the reference night graveyard: 17th-century Dutch harbour town at night, cold blue moonlight, thin sea fog, warm orange lantern light, muted desaturated colours, soft film grain. Low-angle view looking up at the squat stone bell tower of this church, a dark bronze bell swinging in an open belfry arch at the top, the moon half-hidden by drifting clouds, the lit lantern by the church door glowing below, a few leaning gravestones and grass in the foreground, wisps of fog. No people.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/graveyard_after.png"
+  ],
+  "consumed_credits": 6
+}

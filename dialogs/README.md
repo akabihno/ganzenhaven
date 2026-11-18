@@ -183,7 +183,16 @@ with the arrows. A hotspot can also have **Opens** `journal` or `inventory`.
 
 **`tavern_keeper_dead`** is the one flag the game itself knows: setting it starts the second
 half, and **night falls**. For now it is set by a placeholder option on the tavern's barrels
-(`tavern/barrels.txt`); move that block wherever the death really happens.
+(`tavern/barrels.txt`); move that block wherever the death really happens. Right after it
+the **funeral** plays (`@cutscene funeral graveyard`) and the game carries on in the night
+graveyard.
+
+The funeral (`scripts/game/FuneralCutscene.cs`) is four painted shots — the bell tower with
+the bell swinging, the procession up the hill, the coffin lowered into the grave, the
+gravedigger alone — with slow camera moves, drifting fog and flickering lanterns, while the
+author reads the captions in `cutscenes/funeral.txt` (one caption per line; edit them, then
+`python3 tools/elevenlabs_voice.py cutscenes/funeral`). Each shot lasts as long as its
+caption takes to read. Pictures: `assets/art/cutscenes/funeral/`.
 
 At night:
 
@@ -222,7 +231,8 @@ Fireflies drift about the oak there too, flashing (`FireflyCount`).
 @wait 1.5
 @music tavern        switch the background track (audio/music/<id>.ogg); @music stop
                      (until the next screen change: every location plays its own track)
-@cutscene funeral    play a 3D cutscene, then continue this conversation
+@cutscene funeral    play a cutscene, then continue this conversation
+@cutscene funeral graveyard   …and continue it in that location afterwards
 @travel graveyard    end the conversation and go to a location
 @map                 end the conversation and open the map
 @label name   @goto name     (labels at the top level of the file)

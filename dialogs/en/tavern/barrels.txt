@@ -1,5 +1,5 @@
 # PLACEHOLDER — the Tavern Keeper's death is triggered here for now. Move the
-# "$set tavern_keeper_dead" block wherever it really belongs.
+# "$set tavern_keeper_dead" block (and the funeral after it) wherever it really belongs.
 @if tavern_keeper_dead
   Ale barrels behind the counter. Nobody is pouring.
 @else
@@ -8,5 +8,6 @@
     Behind the counter something heavy falls, and the tavern goes very quiet.
     The Tavern Keeper is dead. By the time anyone thinks to fetch the priest, night has fallen on Ganzenhaven.
     $set tavern_keeper_dead
-    @travel tavern
+    @cutscene funeral graveyard
+    $set funeral_seen
   * Leave them be.  @leave

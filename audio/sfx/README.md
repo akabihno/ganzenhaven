@@ -22,3 +22,17 @@ Processing from raw MP3 to OGG (`ffmpeg … -c:a libvorbis -q:a 6`):
 | gull_indignant | 2 s | seagull crash: the squawk on getting up |
 
 Levels and timing within the scene are set in `scripts/SeagullCrash.cs` (`PrepareSound`).
+
+## Funeral cutscene
+
+| File | Length | Used in |
+|---|---|---|
+| funeral_bell | 9 s | the knell over the bell tower and the procession (synthesised: a tuned bell's partials, clapper knock, outdoor reverb; -18 LUFS) |
+| night_wind_loop | 20 s loop | throughout (until it exists, `harbour_fog_loop` stands in) |
+| procession_steps | 12 s loop | the procession |
+| coffin_ropes | 6 s | the coffin lowered into the grave |
+| shovel_earth | 7 s loop | the gravedigger at work |
+| fox_bark | 3 s | before the last caption |
+
+`sh tools/make_funeral_sfx.sh` generates the ones still missing; the cutscene skips any that
+aren't there yet. Levels and timing are in `scripts/game/FuneralCutscene.cs`.

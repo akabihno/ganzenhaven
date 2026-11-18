@@ -1,0 +1,11 @@
+{
+  "task_id": "01a1ef7c-4e8e-75e9-993c-b56a797e8a2e",
+  "prompt": "Photorealistic cinematic 35mm film still in exactly the look of the reference night graveyard: 17th-century Dutch harbour town at night, cold blue moonlight, thin sea fog, warm orange lantern light, muted desaturated colours, soft film grain. A burial in this graveyard at night: a freshly dug open grave in the grass between old gravestones, two men in dark cloaks lowering a plain wooden coffin into it on ropes, the young tonsured priest of the second reference in his black cassock standing at the head of the grave reading from a small book, a few hooded mourners holding lanterns around the grave, the stone church wall and its lantern behind, fog low on the ground. Medium-wide shot at eye level.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/graveyard_after.png",
+    "assets/art/characters/priest.png"
+  ],
+  "consumed_credits": 6
+}

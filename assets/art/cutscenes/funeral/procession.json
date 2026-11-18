@@ -1,0 +1,11 @@
+{
+  "task_id": "01a1ef7c-4e85-7272-9d9d-a03ca705096f",
+  "prompt": "Photorealistic cinematic 35mm film still in exactly the look of the reference night graveyard: 17th-century Dutch harbour town at night, cold blue moonlight, thin sea fog, warm orange lantern light, muted desaturated colours, soft film grain. A funeral procession at night climbing the path from the harbour (second reference) up to this stone church on the hill (first reference): six men in dark hooded cloaks carry a plain dark wooden coffin on their shoulders, followed by a long line of mourners in 17th-century Dutch clothes, many holding lanterns, a winding line of small warm lights through the blue fog, the sea and moored ships below. Seen from the side and a little above, at a distance; no faces visible.",
+  "model": "nano-banana-2",
+  "aspect": "16:9",
+  "references": [
+    "assets/art/backgrounds/graveyard_after.png",
+    "assets/art/backgrounds/harbor_after.png"
+  ],
+  "consumed_credits": 6
+}

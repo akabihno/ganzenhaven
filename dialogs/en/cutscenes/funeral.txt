@@ -1,0 +1,9 @@
+# The funeral cutscene's captions, read by the author (scripts/game/FuneralCutscene.cs).
+# One line per caption, in order; the cutscene shows them over its shots:
+#   1 the bell tower, 2 the procession, 3 the grave, 4 and 5 the gravedigger.
+# Edit freely, then voice them: python3 tools/elevenlabs_voice.py cutscenes/funeral
+They buried the Tavern Keeper that same night. Nobody remembered deciding it, and nobody asked.
+Half the harbour followed the coffin up the hill. The other half watched from behind their shutters.
+The priest read quickly, as though the words were cold, and the ropes creaked as the coffin went down.
+Then the lanterns went back down to the town, one by one, and only the gravedigger stayed to finish the work.
+Somewhere behind the church, a fox barked.

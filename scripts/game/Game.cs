@@ -140,7 +140,8 @@ public partial class Game : Node
 		switch (name)
 		{
 			case "cutscene":
-				PlayCutscene(arg, () => Dialogue.Resume());
+				// "@cutscene funeral graveyard": afterwards the game carries on in that location.
+				PlayCutscene(arg, () => Dialogue.Resume(), args.Length > 1 ? args[1] : null);
 				break;
 			case "travel":
 				GoToLocation(arg);
@@ -153,8 +154,9 @@ public partial class Game : Node
 
 	// ---------------------------------------------------------------- cutscenes
 
-	/// <summary>Plays a 3D cutscene full screen, then returns to the current scene.</summary>
-	public async void PlayCutscene(string id, Action onDone)
+	/// <summary>Plays a cutscene full screen, then returns to the current scene, or moves on to
+	/// location <paramref name="thenLocation"/> when one is given.</summary>
+	public async void PlayCutscene(string id, Action onDone, string thenLocation = null)
 	{
 		if (!Cutscenes.TryGetValue(id, out var path) || !ResourceLoader.Exists(path))
 		{
@@ -164,6 +166,13 @@ public partial class Game : Node
 		}
 
 		_returnScene = GetTree().CurrentScene?.SceneFilePath;
+		string next = string.IsNullOrEmpty(thenLocation) ? null : $"res://scenes/game/locations/{thenLocation}.tscn";
+		if (next != null && ResourceLoader.Exists(next))
+		{
+			GameState.Instance.Location = thenLocation;
+			GameState.Instance.Save();
+			_returnScene = next;
+		}
 		Music.Play("");
 		await FadeTo(1f, 0.6f);
 
